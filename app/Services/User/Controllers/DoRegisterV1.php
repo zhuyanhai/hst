@@ -1,0 +1,165 @@
+<?php
+
+namespace App\Services\User\Controllers;
+
+use Illuminate\Support\Facades\DB;
+use App\Services\ServiceAbstract;
+use App\Services\User\Models\UserModel;
+use App\Services\User\Models\RegistModel;
+use App\Services\User\Models\AccountModel;
+use App\Services\User\Helpers\LoginToken;
+
+/**
+ * 用户注册服务
+ *
+ * 版本号：v1
+ *
+ * Class DoRegisterV1
+ * @package App\Services\User\Controllers;
+ */
+class DoRegisterV1 extends ServiceAbstract
+{
+    /**
+     * 校验请求参数
+     *
+     * true = 校验通过 false=校验不通过
+     * @return boolean
+     */
+    public function paramsValidate()
+    {
+        return $this->_validate($this->params, [
+            'account' => 'required',//登录帐号
+            'password' => 'required',//登录密码
+            //'vcode' => 'required',//校验码
+            'code' => 'required',//手机验证码
+            'personid' => 'required',//身份证号
+        ], [
+            'account.required' => '请输入手机号',
+            'password.required' => '请输入密码',
+            //'vcode.required' => '参数错误',
+            'code.required' => '请输入验证码',
+            'personid.required' => '请输入身份正号',
+        ]);
+    }
+
+    /**
+     * 服务必须实现的方法，因为调用服务会自动调用本方法
+     *
+     * @return array
+     */
+    public function run()
+    {
+        //验证码
+        $result = callService('foundation.checkMobileCodeV1', ['account'=>$this->params['account'], 'code' => $this->params['code']]);
+        if ($result['code'] != 0) {
+            //$this->error($result['msg']); 临时注释
+        }
+
+        $data['phone'] = trim($this->params['account']);
+        $data['password'] = trim($this->params['password']);
+        $data['personid'] = strtolower($this->params['personid']);
+        $data['createtime'] = time();
+        $data['openfire'] = rand(100000, 999999);
+
+        //16.07.12 只允许特定号段手机号注册
+        if (strlen($data['phone']) == 11 && !$this->_checkRegistLimit($data['phone'])) {
+            $this->error('该手机号段无法注册');
+        }
+
+        //检测身份证号
+        if (!preg_match("/^[1-9][0-9]{16}[0-9x]$/", $data['personid'])) {
+            $this->error('身份证号码不正确');
+        }
+
+        //检测手机号
+        if (UserModel::where('phone', $data['phone'])->first()) {
+            $this->error('该手机号已注册');
+        }
+
+        //检测密码格式
+        if (!preg_match("/^[0-9a-zA-Z]{6,15}$/", $data['password'])) {
+            $this->error('密码由字母或数字组成长度6-15位');
+        }
+
+        $pwdForIcall = $data['password'];
+        $data['password'] = md5($data['password']);
+
+        //$acctM = new Model('account');
+        //$openfire = new Openfire();
+        //$iMod = new IcallModel(); todo 没有apps库
+
+
+        DB::beginTransaction();
+
+        //注册
+        $userModel = new UserModel();
+        $userModel->phone = $data['phone'];
+        $userModel->password = $data['password'];
+        $userModel->personid = $data['personid'];
+        $userModel->createtime = $data['createtime'];
+        $userModel->openfire = $data['openfire'];
+        $flag1 = $userModel->save();
+
+        $accountModel = new AccountModel();
+        $accountModel->uid = $userModel->uid;
+        $flag2 = $accountModel->save();
+
+        if (!$flag1 || !$flag2) {
+            DB::rollBack();
+            $this->error('IM注册失败');
+        }
+
+        //注册Openfire
+//        $ret = $openfire->regist($uid, $data['openfire']);
+//        $flag3 = $ret == '1' ? true : false;
+//        if (!$flag3) {
+//            $this->rollback();
+//            $openfire->delete($uid);
+//            return showData(new \stdClass(), 'openFire注册失败', 1);
+//        }
+
+        //注册icall
+//        $iBack = iCallRegist($data['phone'], $pwdForIcall, I('pv'));//pv=iphone/android
+//        $flag4 = $iBack['result'] == '0' ? true : false;
+//        if (!$flag4) {
+//            $this->rollback();
+//            $iMod->deleUser($data['phone'], 'phone');
+//            $openfire->delete($uid);
+//            return showData(new \stdClass(), 'voip注册失败', 1);
+//        }
+
+        DB::commit();
+        $result = callService('user.getInfoV1', ['userid' => $userModel->uid]);
+        if ($result['code'] != 0) {
+            $this->error('IM注册失败');
+        }
+
+        $return = $result['data'];
+        $return['iuid'] = 22;//$iBack['uid'];
+
+        //用户登录token
+        $return['token'] = LoginToken::build($return['uid'], $return['phone'], $return['password'], $return['createtime']);
+
+        return $this->response($return);
+    }
+
+    /**
+     * 检测只允许特定号段手机号注册
+     *
+     * @param $account 用户登录帐号
+     * @return bool
+     */
+    private function _checkRegistLimit($account)
+    {
+        $registModel = RegistModel::first();
+        $limit = $registModel->num;
+        if ($limit) {
+            $limits = explode(';',$limit);
+            for($i = 0, $total = count($limits); $i < $total; $i++){
+                if (preg_match("/^".$limits[$i]."/", $account)) {
+                    return true;
+                }
+            }
+        }
+    }
+}
