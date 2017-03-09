@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Foundation\Api;
+namespace App\Http\Controllers\User\Api;
 
 use App\Http\Controllers\ApiController;
 
@@ -10,7 +10,7 @@ use App\Http\Controllers\ApiController;
  * 版本号：v1
  *
  * Class DoLoginV1Controller
- * @package App\Http\Controllers\Foundation\Api
+ * @package App\Http\Controllers\User\Api
  */
 class DoLoginV1Controller extends ApiController
 {
@@ -38,17 +38,17 @@ class DoLoginV1Controller extends ApiController
      */
     public function run()
     {
-        $result = callService('v1', 'user.doLogin', $this->_params);
+        $result = callService('user.doLoginV1', $this->_params);
 
         if ($result['code'] != 0) {
             $this->error($result['msg']);
         }
 
-        $result['cookies'] = [
-            ['hst_token' => $result['data']['token']],
+        $cookies = [
+            'hst_token' => $result['data']['token'],
         ];
 
-        return $this->response($result['data'], $result['cookies']);
+        return $this->response($result['data'], $cookies);
 
 //        session([
 //            'userid' => $accountModel->userid,

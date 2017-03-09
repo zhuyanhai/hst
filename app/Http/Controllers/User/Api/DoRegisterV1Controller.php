@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Foundation\Api;
+namespace App\Http\Controllers\User\Api;
 
 use App\Http\Controllers\ApiController;
 
@@ -10,7 +10,7 @@ use App\Http\Controllers\ApiController;
  * 版本号：v1
  *
  * Class DoRegisterV1Controller
- * @package App\Http\Controllers\Foundation\Api
+ * @package App\Http\Controllers\User\Api
  */
 class DoRegisterV1Controller extends ApiController
 {

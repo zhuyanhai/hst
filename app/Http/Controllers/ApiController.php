@@ -179,7 +179,7 @@ abstract class ApiController extends BaseController
      * @param  array $result 结果
      * @return response
      */
-    protected function response(array $result = array())
+    protected function response(array $result = array(), array $cookies = array())
     {
         if (empty($result)) {
             $result = [
@@ -188,8 +188,6 @@ abstract class ApiController extends BaseController
             ];
         } else {
             if ($this->isH5Request) {
-                $cookies = $result['cookies'];
-                unset($result['cookies']);
                 $responseObj = response()->jsonp($this->params['jsoncallback'], $result);
                 if (!empty($cookies)) {
                     foreach ($cookies as $cookie) {
@@ -198,7 +196,6 @@ abstract class ApiController extends BaseController
                 }
                 return $responseObj;
             } else {
-                $cookies = $result['cookies'];
                 if (!empty($cookies)) {
                     $result['cookies'] = json_decode(json_encode($cookies));
                 }
