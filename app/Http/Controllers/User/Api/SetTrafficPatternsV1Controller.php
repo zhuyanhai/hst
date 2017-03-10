@@ -25,11 +25,15 @@ class SetTrafficPatternsV1Controller extends ApiController
         return $this->_validate($this->_params, [
             'userid'  => 'required',
             'patterns'=> 'required|integer|between:1,3',
+            'allowExternalUpdates' => 'required|integer|between:0,1',
         ], [
             'userid.required'  => '参数丢失',
             'patterns.required'=> '流量参数丢失',
             'patterns.integer'=> '流量参数错误',
-            'patterns.between'=> '流量参数错误'
+            'patterns.between'=> '流量参数错误',
+            'allowExternalUpdates.required'=> '更新状态参数丢失',
+            'allowExternalUpdates.integer'=> '更新状态参数错误',
+            'allowExternalUpdates.between'=> '更新状态参数错误'
         ]);
     }
 

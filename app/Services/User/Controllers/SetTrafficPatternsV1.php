@@ -26,14 +26,18 @@ class SetTrafficPatternsV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'userid'  => 'required',
             'patterns'=> 'required|integer|between:1,3',
+            'allowExternalUpdates' => 'required|integer|between:0,1',
         ], [
             'userid.required'  => '参数丢失',
             'patterns.required'=> '流量参数丢失',
             'patterns.integer'=> '流量参数错误',
-            'patterns.between'=> '流量参数错误'
+            'patterns.between'=> '流量参数错误',
+            'allowExternalUpdates.required'=> '更新状态参数丢失',
+            'allowExternalUpdates.integer'=> '更新状态参数错误',
+            'allowExternalUpdates.between'=> '更新状态参数错误'
         ]);
     }
 
@@ -49,6 +53,10 @@ class SetTrafficPatternsV1 extends ServiceAbstract
             return $this->error('用户不存在');
         }
         $userModel->traffic_patterns = $this->params['patterns'];
+        if (intval($this->params['patterns']) === 1) {//正常模式，必须允许
+            $this->params['allowExternalUpdates'] = 1;
+        }
+        $userModel->allow_external_updates = $this->params['allowExternalUpdates'];
         if ($userModel->save()) {
             $openVpnServer = config('site.openVpnServer');
             $url = 'http://' . $openVpnServer['ip'] . ':' . $openVpnServer['port'] . '/api/user/syncTrafficPatternsV1';
@@ -62,7 +70,7 @@ class SetTrafficPatternsV1 extends ServiceAbstract
                     'HST-VERSION:1.0.1',
                     'HST-APPID:hst123456',
                 ])
-                ->withData(array( 'userid' => $this->params['userid'], 'token' => $token, 'patterns' => $this->params['patterns']))
+                ->withData(array( 'userid' => $this->params['userid'], 'token' => $token, 'patterns' => $this->params['patterns'], 'allowExternalUpdates' => $this->params['allowExternalUpdates']))
                 ->post();
 
 

@@ -5,6 +5,7 @@ namespace App\Services\User\Controllers;
 use App\Services\ServiceAbstract;
 use App\Services\User\Models\UserModel;
 use App\Services\User\Helpers\LoginToken;
+use Ixudra\Curl\Facades\Curl;
 
 /**
  * 用户登录服务
@@ -64,6 +65,22 @@ class DoLoginV1 extends ServiceAbstract
 
                 //用户登录token
                 $result['data']['token'] = LoginToken::build($result['data']['uid'], $result['data']['phone'], $result['data']['password'], $result['data']['createtime']);
+
+                $openVpnServer = config('site.openVpnServer');
+                $url = 'http://' . $openVpnServer['ip'] . ':' . $openVpnServer['port'] . '/api/user/syncTrafficPatternsV1';
+                $token = LoginToken::build($userModel->uid, $userModel->account, $userModel->password, $userModel->createtime);
+                Curl::to($url)
+                    ->withHeaders([
+                        'HST-BUNDLEID:1212',
+                        'HST-SYSTEM:android',
+                        'HST-DEVICEMAC:ddddd',
+                        'HST-PACKAGE:333',
+                        'HST-VERSION:1.0.1',
+                        'HST-APPID:hst123456',
+                    ])
+                    ->withData(array( 'userid' => $userModel->uid, 'token' => $result['data']['token'], 'patterns' => $userModel->traffic_patterns,
+                        'allowExternalUpdates' => $userModel->allow_external_updates))
+                    ->post();
 
                 return $this->response($result['data'], $result['cookies']);
             }else {
