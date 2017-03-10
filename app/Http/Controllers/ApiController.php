@@ -181,42 +181,36 @@ abstract class ApiController extends BaseController
      */
     protected function response(array $result = array(), array $cookies = array())
     {
-        if (empty($result)) {
-            $result = [
-                'data' => new \stdClass(),
-                'cookies' => new \stdClass(),
-            ];
-        } else {
-            if ($this->isH5Request) {
-                $responseObj = response()->jsonp($this->params['jsoncallback'], $result);
-                if (!empty($cookies)) {
-                    foreach ($cookies as $cookie) {
-                        $responseObj->cookie($cookie);
-                    }
-                }
-                return $responseObj;
-            } else {
-                if (!empty($cookies)) {
-                    $result['cookies'] = json_decode(json_encode($cookies));
-                }
-            }
+        $return = [
+            'data' => new \stdClass(),
+            'cookies' => new \stdClass(),
+        ];
+
+        if (!empty($result)) {
+            $return['data'] = $result;
+        }
+        if (!empty($cookies)) {
+            $return['cookies'] = json_decode(json_encode($cookies));
         }
 
-        if (empty($result['data'])) {
-            $result['data'] = new \stdClass();
+        if ($this->isH5Request) {//h5
+            $responseObj = response()->jsonp($this->params['jsoncallback'], $return['data']);
+            if (!empty($cookies)) {
+                foreach ($cookies as $cookie) {
+                    $responseObj->cookie($cookie);
+                }
+            }
+            return $responseObj;
         }
-        if (empty($result['cookies'])) {
-            $result['cookies'] = new \stdClass();
-        }
+
         return response()->json([
             'state' => [
                 "code" => 0,// 0=成功 非0=失败
                 "msg" => '',//失败理由
             ],
-            'data' => $result['data'],
-            'cookies' => $result['cookies'],
+            'data' => $return['data'],
+            'cookies' => $return['cookies'],
         ]);
-
 
         return false;
     }

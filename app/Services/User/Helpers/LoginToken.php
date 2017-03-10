@@ -29,7 +29,7 @@ class LoginToken
     {
         $t1 = chr(mt_rand(65,90));
         $t2 = chr(mt_rand(65,90));
-        return $t1.md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime).$t2;
+        return strtoupper($t1.md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime).$t2);
     }
 
     /**

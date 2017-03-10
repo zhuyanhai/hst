@@ -3,7 +3,10 @@
 namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
-use App\Services\User\Models\UserModel;
+use Ixudra\Curl\Facades\Curl;
+use App\Services\User\Helpers\LoginToken;
+use App\Services\User\Helpers\User;
+use Illuminate\Support\Facades\Redis;
 
 /**
  * 设置用户省流量模式
@@ -41,9 +44,35 @@ class SetTrafficPatternsV1 extends ServiceAbstract
      */
     public function run()
     {
-        $userModel = UserModel::where('uid', $this->params['userid'])->first();
+        $userModel = User::getBaseInfoByUserid($this->params['userid']);
+        if (!$userModel) {
+            return $this->error('用户不存在');
+        }
         $userModel->traffic_patterns = $this->params['patterns'];
-        $userModel->save();
+        if ($userModel->save()) {
+            $openVpnServer = config('site.openVpnServer');
+            $url = 'http://' . $openVpnServer['ip'] . ':' . $openVpnServer['port'] . '/api/user/syncTrafficPatternsV1';
+            $token = LoginToken::build($userModel->uid, $userModel->account, $userModel->password, $userModel->createtime);
+            Curl::to($url)
+                ->withHeaders([
+                    'HST-BUNDLEID:1212',
+                    'HST-SYSTEM:android',
+                    'HST-DEVICEMAC:ddddd',
+                    'HST-PACKAGE:333',
+                    'HST-VERSION:1.0.1',
+                    'HST-APPID:hst123456',
+                ])
+                ->withData(array( 'userid' => $this->params['userid'], 'token' => $token, 'patterns' => $this->params['patterns']))
+                ->post();
+
+
+//            Redis::hmset('b', ['name'=> 'dd', 'age'=> 123]);
+//            $d = Redis::hget('b', 'name');
+//            print_r($d);exit;
+
+
+            //todo log 系统
+        }
         return $this->response();
     }
 
