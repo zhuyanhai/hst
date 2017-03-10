@@ -55,6 +55,8 @@ class FormatUserInfo
                 $tmp['picture1'] = !isset($v['picture1']) ? '' : $v['picture1'];
                 $tmp['picture2'] = !isset($v['picture2']) ? '' : $v['picture2'];
                 $tmp['picture3'] = !isset($v['picture3']) ? '' : $v['picture3'];
+                $tmp['personFrontPic'] = !isset($v['person_front_pic']) ? '' : $v['person_front_pic'];
+                $tmp['personBackPic'] = !isset($v['person_back_pic']) ? '' : $v['person_back_pic'];
                 $tmp['cover'] = !isset($v['cover']) ? '' : $v['cover'];
                 if ($v['remark']) {//备注名
                     $pinyin = app('pinyin');

@@ -179,10 +179,11 @@ abstract class ApiController extends BaseController
      * @param  array $result 结果
      * @return response
      */
-    protected function response(array $result = array(), array $cookies = array())
+    protected function response(array $result = array(), array $cookies = array(), array $globalData = array())
     {
         $return = [
             'data' => new \stdClass(),
+            'globalData' => new \stdClass(),
             'cookies' => new \stdClass(),
         ];
 
@@ -191,6 +192,9 @@ abstract class ApiController extends BaseController
         }
         if (!empty($cookies)) {
             $return['cookies'] = json_decode(json_encode($cookies));
+        }
+        if (!empty($globalData)) {
+            $return['globalData'] = $globalData;
         }
 
         if ($this->isH5Request) {//h5
@@ -209,6 +213,12 @@ abstract class ApiController extends BaseController
                 "msg" => '',//失败理由
             ],
             'data' => $return['data'],
+            'globalData' => [
+                'currentResidualFlow' => '10M',//当前剩余流量
+                'todayFlow' => '10M',//今日已用流量
+                'todaySavedFlow' => '5m',//今日已省流量
+
+            ],//$return['globalData'], todo
             'cookies' => $return['cookies'],
         ]);
 

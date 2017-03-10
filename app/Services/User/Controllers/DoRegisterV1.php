@@ -30,15 +30,21 @@ class DoRegisterV1 extends ServiceAbstract
         return $this->_validate($this->params, [
             'account' => 'required',//登录帐号
             'password' => 'required',//登录密码
-            //'vcode' => 'required',//校验码
-            'code' => 'required',//手机验证码
-            'personid' => 'required',//身份证号
+//'vcode' => 'required',//校验码
+            //'code' => 'required',//手机验证码
+            //'pv' => 'required',//系统类型 android
+            //'personid' => 'required',//身份证号
+            'personForntPic' => 'required',//身份证正面图片
+            'personBackPic' => 'required',//身份证背面图片
         ], [
             'account.required' => '请输入手机号',
             'password.required' => '请输入密码',
-            //'vcode.required' => '参数错误',
-            'code.required' => '请输入验证码',
-            'personid.required' => '请输入身份正号',
+//'vcode.required' => '参数错误',
+            //'code.required' => '请输入验证码',
+            //'personid.required' => '请输入身份证号',
+            //'pv.required' => '参数错误',
+            'personForntPic.required' => '请上传身份证正面照片',
+            'personBackPic.required' => '请上传身份证背面照片',
         ]);
     }
 
@@ -49,15 +55,16 @@ class DoRegisterV1 extends ServiceAbstract
      */
     public function run()
     {
-        //验证码
-        $result = callService('foundation.checkMobileCodeV1', ['account'=>$this->params['account'], 'code' => $this->params['code']]);
-        if ($result['code'] != 0) {
+        //验证码 allen 本次注释掉，下个版本再考虑使用
+        //$result = callService('foundation.checkMobileCodeV1', ['account'=>$this->params['account'], 'code' => $this->params['code']]);
+        //if ($result['code'] != 0) {
             //$this->error($result['msg']); 临时注释
-        }
+        //}
 
         $data['phone'] = trim($this->params['account']);
         $data['password'] = trim($this->params['password']);
-        $data['personid'] = strtolower($this->params['personid']);
+        //allen 下个版本再考虑强制填写
+        $data['personid'] = (isset($this->params['personid']))?strtolower($this->params['personid']):'';
         $data['createtime'] = time();
         $data['openfire'] = rand(100000, 999999);
 
@@ -67,8 +74,10 @@ class DoRegisterV1 extends ServiceAbstract
         }
 
         //检测身份证号
-        if (!preg_match("/^[1-9][0-9]{16}[0-9x]$/", $data['personid'])) {
-            $this->error('身份证号码不正确');
+        if (!empty($data['personid'])) {
+            if (!preg_match("/^[1-9][0-9]{16}[0-9x]$/", $data['personid'])) {
+                $this->error('身份证号码不正确');
+            }
         }
 
         //检测手机号
@@ -98,6 +107,8 @@ class DoRegisterV1 extends ServiceAbstract
         $userModel->personid = $data['personid'];
         $userModel->createtime = $data['createtime'];
         $userModel->openfire = $data['openfire'];
+        $userModel->person_front_pic = $data['personForntPic'];
+        $userModel->person_back_pic = $data['personBackPic'];
         $flag1 = $userModel->save();
 
         $accountModel = new AccountModel();

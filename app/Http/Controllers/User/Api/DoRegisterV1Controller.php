@@ -26,16 +26,20 @@ class DoRegisterV1Controller extends ApiController
             'account' => 'required',//登录帐号
             'password' => 'required',//登录密码
 //'vcode' => 'required',//校验码
-            'code' => 'required',//手机验证码
-            'pv' => 'required',//系统类型 android
-            'personid' => 'required',//身份证号
+            //'code' => 'required',//手机验证码
+            //'pv' => 'required',//系统类型 android
+            //'personid' => 'required',//身份证号
+            'personForntPic' => 'required',//身份证正面图片
+            'personBackPic' => 'required',//身份证背面图片
         ], [
             'account.required' => '请输入手机号',
             'password.required' => '请输入密码',
 //'vcode.required' => '参数错误',
-            'code.required' => '请输入验证码',
-            'personid.required' => '请输入身份正号',
-            'pv.required' => '参数错误',
+            //'code.required' => '请输入验证码',
+            //'personid.required' => '请输入身份证号',
+            //'pv.required' => '参数错误',
+            'personForntPic.required' => '请上传身份证正面照片',
+            'personBackPic.required' => '请上传身份证背面照片',
         ]);
     }
 
