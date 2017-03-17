@@ -24,10 +24,10 @@ class PersonBackPicV1Controller extends ApiController
     protected function paramsValidate()
     {
         return $this->_validate($this->_params, [
-            'uid'  => 'required|integer',
+            'userid'  => 'required|integer',
         ], [
-            'uid.required'  => '参数错误',
-            'uid.integer' => '参数错误',
+            'userid.required'  => '参数错误',
+            'userid.integer' => '参数错误',
         ]);
     }
 
@@ -40,17 +40,17 @@ class PersonBackPicV1Controller extends ApiController
     public function run(Request $request)
     {
         if ($request->hasFile('Filedata')) {
-            $uid = $this->_params['uid'];
-            $uidMd5 = md5($uid);
-            $dir1 = substr($uidMd5, 0, 2);
-            $dir2 = substr($uidMd5, 2, 2);
-            $dir  = '/user_id_card/'.$dir1.'/'.$dir2.'/'.$uid;
-            $filename = $uid.'_back.jpg';
+            $userid = $this->_params['userid'];
+            $useridMd5 = md5($userid);
+            $dir1 = substr($useridMd5, 0, 2);
+            $dir2 = substr($useridMd5, 2, 2);
+            $dir  = '/user_id_card/'.$dir1.'/'.$dir2.'/'.$userid;
+            $filename = $userid.'_back.jpg';
             $returnPath = 'http://hst.bxshare.cn/storage'.$dir.'/'.$filename.'?v='.time();
 
             Storage::makeDirectory($dir);
 
-            $path = $request->file('Filedata')->storeAs('/public' . $dir, $uid.'_back.jpg');
+            $path = $request->file('Filedata')->storeAs('/public' . $dir, $userid.'_back.jpg');
 
 
             return $this->response([
