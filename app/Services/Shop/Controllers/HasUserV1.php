@@ -24,7 +24,7 @@ class HasUserV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'userid'  => 'required',
         ], [
             'userid.required'  => '参数丢失',
@@ -38,7 +38,7 @@ class HasUserV1 extends ServiceAbstract
      */
     public function run()
     {
-        $shopModel = ShopModel::where('uid', $this->params['userid'])->where('status', 1)->first();
+        $shopModel = ShopModel::where('uid', $this->_params['userid'])->where('status', 1)->first();
         if ($shopModel) {
             return $this->response(['isHas' => 1]);
         } else {

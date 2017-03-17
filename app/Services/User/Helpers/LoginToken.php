@@ -27,9 +27,7 @@ class LoginToken
      */
     public static function build($userid, $account, $password, $createtime)
     {
-        $t1 = chr(mt_rand(65,90));
-        $t2 = chr(mt_rand(65,90));
-        return strtoupper($t1.md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime).$t2);
+        return strtoupper(md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime));
     }
 
     /**

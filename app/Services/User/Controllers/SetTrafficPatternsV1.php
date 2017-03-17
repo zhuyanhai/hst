@@ -3,10 +3,8 @@
 namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
-use Ixudra\Curl\Facades\Curl;
 use App\Services\User\Helpers\LoginToken;
 use App\Services\User\Helpers\User;
-use Illuminate\Support\Facades\Redis;
 
 /**
  * 设置用户省流量模式
@@ -48,36 +46,21 @@ class SetTrafficPatternsV1 extends ServiceAbstract
      */
     public function run()
     {
-        $userModel = User::getBaseInfoByUserid($this->params['userid']);
+        $userModel = User::getBaseInfoByUserid($this->_params['userid']);
         if (!$userModel) {
             return $this->error('用户不存在');
         }
-        $userModel->traffic_patterns = $this->params['patterns'];
-        if (intval($this->params['patterns']) === 1) {//正常模式，必须允许
-            $this->params['allowExternalUpdates'] = 1;
+        $userModel->traffic_patterns = $this->_params['patterns'];
+        if (intval($this->_params['patterns']) === 1) {//正常模式，必须允许
+            $this->_params['allowExternalUpdates'] = 1;
         }
-        $userModel->allow_external_updates = $this->params['allowExternalUpdates'];
+        $userModel->allow_external_updates = $this->_params['allowExternalUpdates'];
         if ($userModel->save()) {
-            $openVpnServer = config('site.openVpnServer');
-            $url = 'http://' . $openVpnServer['ip'] . ':' . $openVpnServer['port'] . '/api/user/syncTrafficPatternsV1';
-            $token = LoginToken::build($userModel->uid, $userModel->account, $userModel->password, $userModel->createtime);
-            Curl::to($url)
-                ->withHeaders([
-                    'HST-BUNDLEID:1212',
-                    'HST-SYSTEM:android',
-                    'HST-DEVICEMAC:ddddd',
-                    'HST-PACKAGE:333',
-                    'HST-VERSION:1.0.1',
-                    'HST-APPID:hst123456',
-                ])
-                ->withData(array( 'userid' => $this->params['userid'], 'token' => $token, 'patterns' => $this->params['patterns'], 'allowExternalUpdates' => $this->params['allowExternalUpdates']))
-                ->post();
 
-
-//            Redis::hmset('b', ['name'=> 'dd', 'age'=> 123]);
-//            $d = Redis::hget('b', 'name');
-//            print_r($d);exit;
-
+            //设置用户信息到openVpn
+            $token = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
+            User::setInfoToOpenVpn($this->_params['userid'], $token, $this->_params['patterns'], $this->_params['allowExternalUpdates'],
+                $this->_params['_apiHeaders']);
 
             //todo log 系统
         }

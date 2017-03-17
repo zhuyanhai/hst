@@ -24,7 +24,7 @@ class GetMobileCodeV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'phone' => 'required|regex:/^1[34578][0-9]{9}$/',
         ], [
             'phone.required' => '请输入手机号',
@@ -39,7 +39,7 @@ class GetMobileCodeV1 extends ServiceAbstract
      */
     public function run()
     {
-        $phone = $this->params['phone'];
+        $phone = $this->_params['phone'];
         $code  = rand(100000, 999999);
 
         CodeModel::where('phone', $phone)->delete();

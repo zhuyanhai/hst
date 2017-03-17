@@ -22,7 +22,7 @@ class CheckVerificationCodeV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'code' => 'required'
         ], [
             'code.required' => '请输入验证码'
@@ -36,7 +36,7 @@ class CheckVerificationCodeV1 extends ServiceAbstract
      */
     public function run()
     {
-        if ($this->params['code'] != session('milkcaptcha')) {
+        if ($this->_params['code'] != session('milkcaptcha')) {
             $this->error('验证码错误！')->abort();
         }
     }

@@ -44,7 +44,9 @@ class SetTrafficPatternsV1Controller extends ApiController
      */
     public function run()
     {
-        $result = callService('user.SetTrafficPatternsV1', $this->_params);
+        $serviceParams = $this->_params;
+        $serviceParams['_apiHeaders'] = $this->_headers;
+        $result = callService('user.SetTrafficPatternsV1', $serviceParams);
 
         if ($result['code'] != 0) {
             $this->error($result['msg']);

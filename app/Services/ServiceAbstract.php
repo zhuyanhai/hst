@@ -36,7 +36,13 @@ Abstract class ServiceAbstract
      *
      * @var array
      */
-    protected $params = array();
+    protected $_params = array();
+
+    /**
+     * request header 参数
+     * @var array
+     */
+    protected $_headers = array();
 
     /**
      * Request 对象
@@ -53,7 +59,7 @@ Abstract class ServiceAbstract
     public function __construct($params)
     {
         $this->request = request();
-        $this->params = $params;
+        $this->_params = $params;
     }
 
     /**

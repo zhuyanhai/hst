@@ -5,7 +5,7 @@ namespace App\Services\Foundation\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 用户手机验证码数据表
+ * 流量包配置数据表
  *
  * Class FlowModel
  * @package App\Services\Foundation\Models

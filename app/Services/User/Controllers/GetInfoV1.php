@@ -24,7 +24,7 @@ class GetInfoV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'userid'  => 'required',
         ], [
             'userid.required'  => '参数丢失',
@@ -39,13 +39,13 @@ class GetInfoV1 extends ServiceAbstract
     public function run()
     {
         //计算距离
-        $lat    = (isset($this->params['lat']))?trim($this->params['lat']):''; //纬度
-        $lng    = (isset($this->params['lng']))?trim($this->params['lng']):'';  //经度
-        $userid = $this->params['userid'];
-        if (isset($this->params['otherUserid'])) {//查看其它人
-            $otherUserid = $this->params['otherUserid'];
+        $lat    = (isset($this->_params['lat']))?trim($this->_params['lat']):''; //纬度
+        $lng    = (isset($this->_params['lng']))?trim($this->_params['lng']):'';  //经度
+        $userid = $this->_params['userid'];
+        if (isset($this->_params['otherUserid'])) {//查看其它人
+            $otherUserid = $this->_params['otherUserid'];
         } else {
-            $otherUserid = $this->params['userid'];
+            $otherUserid = $this->_params['userid'];
         }
 
         if ($lat && $lng) {

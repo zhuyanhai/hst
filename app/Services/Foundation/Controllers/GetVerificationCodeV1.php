@@ -23,7 +23,7 @@ class GetVerificationCodeV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'w' => 'required|integer|min:50',
             'h' => 'required|integer|min:20',
         ]);
@@ -39,7 +39,7 @@ class GetVerificationCodeV1 extends ServiceAbstract
         //生成验证码图片的Builder对象，配置相应属性
         $builder = new CaptchaBuilder;
         //可以设置图片宽高及字体
-        $builder->build($width = $this->params['w'], $height = $this->params['h'], $font = null);
+        $builder->build($width = $this->_params['w'], $height = $this->_params['h'], $font = null);
         //获取验证码的内容
         $phrase = $builder->getPhrase();
 

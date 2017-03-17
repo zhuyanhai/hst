@@ -182,20 +182,31 @@ abstract class ApiController extends BaseController
     protected function response(array $result = array(), array $cookies = array(), array $globalData = array())
     {
         $return = [
-            'data' => new \stdClass(),
-            'globalData' => new \stdClass(),
+            'data' => [
+                'localData' => new \stdClass(),
+                'globalData' => new \stdClass(),
+            ],
             'cookies' => new \stdClass(),
         ];
 
         if (!empty($result)) {
-            $return['data'] = $result;
+            $return['data']['localData'] = $result;
         }
         if (!empty($cookies)) {
             $return['cookies'] = json_decode(json_encode($cookies));
         }
         if (!empty($globalData)) {
-            $return['globalData'] = $globalData;
+            $return['data']['globalData'] = $globalData;
         }
+
+        //todo 获取全局
+        $return['data']['globalData'] = [
+            //流量单位 M 兆
+            'currentTotalFlow' => 100,//当前总流量
+            'currentResidualFlow' => 10,//当前剩余流量
+            'todayFlow' => 10,//今日已用流量
+            'todaySavedFlow' => 5,//今日已省流量
+        ];
 
         if ($this->isH5Request) {//h5
             $responseObj = response()->jsonp($this->params['jsoncallback'], $return['data']);
@@ -213,12 +224,6 @@ abstract class ApiController extends BaseController
                 "msg" => '',//失败理由
             ],
             'data' => $return['data'],
-            'globalData' => [
-                'currentResidualFlow' => '10M',//当前剩余流量
-                'todayFlow' => '10M',//今日已用流量
-                'todaySavedFlow' => '5m',//今日已省流量
-
-            ],//$return['globalData'], todo
             'cookies' => $return['cookies'],
         ]);
 

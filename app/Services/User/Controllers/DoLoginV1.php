@@ -5,7 +5,7 @@ namespace App\Services\User\Controllers;
 use App\Services\ServiceAbstract;
 use App\Services\User\Models\UserModel;
 use App\Services\User\Helpers\LoginToken;
-use Ixudra\Curl\Facades\Curl;
+use App\Services\User\Helpers\User;
 
 /**
  * 用户登录服务
@@ -25,7 +25,7 @@ class DoLoginV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'account'  => 'required',
             'password' => 'required',
         ], [
@@ -41,12 +41,12 @@ class DoLoginV1 extends ServiceAbstract
      */
     public function run()
     {
-        $userModel = UserModel::where('phone', $this->params['account'])->first();
+        $userModel = UserModel::where('phone', $this->_params['account'])->first();
         if (!$userModel) {
             $this->error('该帐号不存在');
         }
         if (intval($userModel->frozen) !== 1) {
-            if ($userModel->password == md5($this->params['password'])) {
+            if ($userModel->password == md5($this->_params['password'])) {
 
                 //VOIP
                 //$iModel = new \Common\Model\IcallModel();
@@ -64,23 +64,10 @@ class DoLoginV1 extends ServiceAbstract
                 $result['data']['iuid'] = 0;
 
                 //用户登录token
-                $result['data']['token'] = LoginToken::build($result['data']['uid'], $result['data']['phone'], $result['data']['password'], $result['data']['createtime']);
+                $result['data']['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
 
-                $openVpnServer = config('site.openVpnServer');
-                $url = 'http://' . $openVpnServer['ip'] . ':' . $openVpnServer['port'] . '/api/user/syncTrafficPatternsV1';
-                $token = LoginToken::build($userModel->uid, $userModel->account, $userModel->password, $userModel->createtime);
-                Curl::to($url)
-                    ->withHeaders([
-                        'HST-BUNDLEID:1212',
-                        'HST-SYSTEM:android',
-                        'HST-DEVICEMAC:ddddd',
-                        'HST-PACKAGE:333',
-                        'HST-VERSION:1.0.1',
-                        'HST-APPID:hst123456',
-                    ])
-                    ->withData(array( 'userid' => $userModel->uid, 'token' => $result['data']['token'], 'patterns' => $userModel->traffic_patterns,
-                        'allowExternalUpdates' => $userModel->allow_external_updates))
-                    ->post();
+                //设置用户信息到openVpn
+                User::setInfoToOpenVpn($userModel->uid, $result['data']['token'], $userModel->traffic_patterns, $userModel->allow_external_updates, $this->_params['_apiHeaders']);
 
                 return $this->response($result['data'], $result['cookies']);
             }else {

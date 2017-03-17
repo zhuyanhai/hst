@@ -8,6 +8,7 @@ use App\Services\User\Models\UserModel;
 use App\Services\User\Models\RegistModel;
 use App\Services\User\Models\AccountModel;
 use App\Services\User\Helpers\LoginToken;
+use App\Services\User\Helpers\User;
 
 /**
  * 用户注册服务
@@ -27,22 +28,22 @@ class DoRegisterV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'account' => 'required',//登录帐号
             'password' => 'required',//登录密码
-//'vcode' => 'required',//校验码
-            //'code' => 'required',//手机验证码
-            //'pv' => 'required',//系统类型 android
-            //'personid' => 'required',//身份证号
+//            'vcode' => 'required',//校验码
+//            'code' => 'required',//手机验证码
+//            'pv' => 'required',//系统类型 android
+//            'personid' => 'required',//身份证号
             'personForntPic' => 'required',//身份证正面图片
             'personBackPic' => 'required',//身份证背面图片
         ], [
             'account.required' => '请输入手机号',
             'password.required' => '请输入密码',
-//'vcode.required' => '参数错误',
-            //'code.required' => '请输入验证码',
-            //'personid.required' => '请输入身份证号',
-            //'pv.required' => '参数错误',
+//            'vcode.required' => '参数错误',
+//            'code.required' => '请输入验证码',
+//            'personid.required' => '请输入身份证号',
+//            'pv.required' => '参数错误',
             'personForntPic.required' => '请上传身份证正面照片',
             'personBackPic.required' => '请上传身份证背面照片',
         ]);
@@ -61,10 +62,14 @@ class DoRegisterV1 extends ServiceAbstract
             //$this->error($result['msg']); 临时注释
         //}
 
-        $data['phone'] = trim($this->params['account']);
-        $data['password'] = trim($this->params['password']);
+        $data['phone'] = trim($this->_params['account']);
+        $data['password'] = trim($this->_params['password']);
+	    $data['personForntPic'] = trim($this->_params['personForntPic']);
+	    $data['personBackPic'] = trim($this->_params['personBackPic']);
+
         //allen 下个版本再考虑强制填写
-        $data['personid'] = (isset($this->params['personid']))?strtolower($this->params['personid']):'';
+        //$data['personid'] = (isset($this->params['personid']))?strtolower($this->params['personid']):'';
+
         $data['createtime'] = time();
         $data['openfire'] = rand(100000, 999999);
 
@@ -74,12 +79,12 @@ class DoRegisterV1 extends ServiceAbstract
         }
 
         //检测身份证号
-        if (!empty($data['personid'])) {
+/*        if (!empty($data['personid'])) {
             if (!preg_match("/^[1-9][0-9]{16}[0-9x]$/", $data['personid'])) {
                 $this->error('身份证号码不正确');
             }
         }
-
+*/
         //检测手机号
         if (UserModel::where('phone', $data['phone'])->first()) {
             $this->error('该手机号已注册');
@@ -104,7 +109,7 @@ class DoRegisterV1 extends ServiceAbstract
         $userModel = new UserModel();
         $userModel->phone = $data['phone'];
         $userModel->password = $data['password'];
-        $userModel->personid = $data['personid'];
+        $userModel->personid = '';
         $userModel->createtime = $data['createtime'];
         $userModel->openfire = $data['openfire'];
         $userModel->person_front_pic = $data['personForntPic'];
@@ -149,7 +154,10 @@ class DoRegisterV1 extends ServiceAbstract
         $return['iuid'] = 22;//$iBack['uid'];
 
         //用户登录token
-        $return['token'] = LoginToken::build($return['uid'], $return['phone'], $return['password'], $return['createtime']);
+        $return['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
+
+        //设置用户信息到openVpn
+        User::setInfoToOpenVpn($userModel->uid, $return['token'], $userModel->traffic_patterns, $userModel->allow_external_updates, $this->_params['_apiHeaders']);
 
         return $this->response($return);
     }
@@ -162,6 +170,7 @@ class DoRegisterV1 extends ServiceAbstract
      */
     private function _checkRegistLimit($account)
     {
+	return true;
         $registModel = RegistModel::first();
         $limit = $registModel->num;
         if ($limit) {

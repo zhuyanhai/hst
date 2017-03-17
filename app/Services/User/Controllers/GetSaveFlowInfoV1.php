@@ -22,7 +22,7 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'userid'  => 'required',
         ], [
             'userid.required'  => '参数丢失',

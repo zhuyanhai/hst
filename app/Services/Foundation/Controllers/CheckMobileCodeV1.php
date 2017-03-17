@@ -23,7 +23,7 @@ class CheckMobileCodeV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return $this->_validate($this->params, [
+        return $this->_validate($this->_params, [
             'account' => 'required|regex:/^1[34578][0-9]{9}$/',
             'code' => 'required',
         ], [
@@ -40,8 +40,8 @@ class CheckMobileCodeV1 extends ServiceAbstract
      */
     public function run()
     {
-        $phone = $this->params['account'];
-        $code  = $this->params['code'];
+        $phone = $this->_params['account'];
+        $code  = $this->_params['code'];
 
 
         $codeModel = CodeModel::where('phone', $phone)->where('code', $code)->first();
