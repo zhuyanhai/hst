@@ -69,6 +69,22 @@ class DoLoginV1 extends ServiceAbstract
                 //设置用户信息到openVpn
                 User::setInfoToOpenVpn($userModel->uid, $result['data']['token'], $userModel->traffic_patterns, $userModel->allow_external_updates, $this->_params['_apiHeaders']);
 
+                //是否允许登陆，允许1＝代表审核通过 不允许0＝代表审核没有通过
+                if ($result['data']['isRegisterCheck'] < 2) {//<2 审核未通过 或 待审核
+                    if($result['data']['isRegisterCheck'] < 1) {
+                        $checkStatus = 0;//审核不通过
+                    } elseif ($result['data']['personFrontPic'] == '' || $result['data']['personBackPic'] == '') {
+                        $checkStatus = 1;//待审核
+                    } else {
+                        $checkStatus = 2;//审核中
+                    }
+                    return $this->response([
+                        'uid'         => $result['data']['uid'],
+                        'token'       => $result['data']['token'],
+                        'checkStatus' => $checkStatus,
+                    ], $result['cookies']);
+                }
+
                 return $this->response($result['data'], $result['cookies']);
             }else {
                 $this->error('密码错误');

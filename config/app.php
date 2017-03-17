@@ -179,6 +179,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Overtrue\LaravelPinyin\ServiceProvider::class,
         Ixudra\Curl\CurlServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -228,6 +229,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Pinyin' => Overtrue\LaravelPinyin\Facades\Pinyin::class,
         'Curl' => Ixudra\Curl\Facades\Curl::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];

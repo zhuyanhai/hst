@@ -67,6 +67,7 @@ abstract class ApiController extends BaseController
      */
     protected $isH5Request = false;
 
+
     /**
      * 错误码
      *
@@ -78,6 +79,9 @@ abstract class ApiController extends BaseController
         '400' => '未知错误',
         '403' => '无此权限',
         '500' => '服务器异常',
+
+        //指定有意义的错误段 4000 - 4999
+
 
         // 公共错误码
         '1001' => '[appId]缺失',
@@ -110,7 +114,7 @@ abstract class ApiController extends BaseController
      */
     public function __construct(Request $request)
     {
-        $this->_params = $request->all();
+        $this->_params  = $request->all();
         $this->_headers = $request->header();
         if (isset($this->_params['jsoncallback'])) {
             $this->isH5Request = true;
@@ -261,7 +265,7 @@ abstract class ApiController extends BaseController
         $vResult = Validator::make($args, $rules, $messages);
 
         if ($vResult->fails()) {
-            return $this->error('', $vResult->errors()->first());
+            return $this->error($vResult->errors()->first());
         }
 
         return true;

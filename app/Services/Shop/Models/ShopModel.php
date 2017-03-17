@@ -29,7 +29,7 @@ class ShopModel extends Model
     /**
      * 表明模型是否应该被打上时间戳
      *
-     * 针对 create_at update_at 字段
+     * 针对 created_at updated_at 字段
      *
      * @var bool
      */

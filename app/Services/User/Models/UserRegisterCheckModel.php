@@ -5,19 +5,26 @@ namespace App\Services\User\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 指定可以注册的手机号的数据表
+ * 用户注册后审核数据表
  *
- * Class RegistModel
+ * Class UserRegisterCheckModel
  * @package App\Services\User\Models
  */
-class RegistModel extends Model
+class UserRegisterCheckModel extends Model
 {
     /**
      * 数据表名
      *
      * @var string
      */
-    protected $table = 'regist';
+    protected $table = 'user_register_check';
+
+    /**
+     * 数据表 - 主键字段名
+     *
+     * @var string
+     */
+    protected $primaryKey = 'uid';
 
     /**
      * 表明模型是否应该被打上时间戳

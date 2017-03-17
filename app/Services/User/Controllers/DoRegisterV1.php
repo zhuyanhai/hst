@@ -7,6 +7,7 @@ use App\Services\ServiceAbstract;
 use App\Services\User\Models\UserModel;
 use App\Services\User\Models\RegistModel;
 use App\Services\User\Models\AccountModel;
+use App\Services\User\Models\UserRegisterCheckModel;
 use App\Services\User\Helpers\LoginToken;
 use App\Services\User\Helpers\User;
 
@@ -35,8 +36,8 @@ class DoRegisterV1 extends ServiceAbstract
 //            'code' => 'required',//手机验证码
 //            'pv' => 'required',//系统类型 android
 //            'personid' => 'required',//身份证号
-            'personForntPic' => 'required',//身份证正面图片
-            'personBackPic' => 'required',//身份证背面图片
+//            'personFrontPic' => 'required',//身份证正面图片
+//            'personBackPic' => 'required',//身份证背面图片
         ], [
             'account.required' => '请输入手机号',
             'password.required' => '请输入密码',
@@ -44,8 +45,8 @@ class DoRegisterV1 extends ServiceAbstract
 //            'code.required' => '请输入验证码',
 //            'personid.required' => '请输入身份证号',
 //            'pv.required' => '参数错误',
-            'personForntPic.required' => '请上传身份证正面照片',
-            'personBackPic.required' => '请上传身份证背面照片',
+//            'personFrontPic.required' => '请上传身份证正面照片',
+//            'personBackPic.required' => '请上传身份证背面照片',
         ]);
     }
 
@@ -64,8 +65,8 @@ class DoRegisterV1 extends ServiceAbstract
 
         $data['phone'] = trim($this->_params['account']);
         $data['password'] = trim($this->_params['password']);
-	    $data['personForntPic'] = trim($this->_params['personForntPic']);
-	    $data['personBackPic'] = trim($this->_params['personBackPic']);
+	    //$data['personFrontPic'] = trim($this->_params['personFrontPic']);
+	    //$data['personBackPic'] = trim($this->_params['personBackPic']);
 
         //allen 下个版本再考虑强制填写
         //$data['personid'] = (isset($this->params['personid']))?strtolower($this->params['personid']):'';
@@ -75,7 +76,7 @@ class DoRegisterV1 extends ServiceAbstract
 
         //16.07.12 只允许特定号段手机号注册
         if (strlen($data['phone']) == 11 && !$this->_checkRegistLimit($data['phone'])) {
-            $this->error('该手机号段无法注册');
+            //$this->error('该手机号段无法注册');
         }
 
         //检测身份证号
@@ -105,17 +106,18 @@ class DoRegisterV1 extends ServiceAbstract
 
         DB::beginTransaction();
 
-        //注册
+        //插入信息到用户表
         $userModel = new UserModel();
         $userModel->phone = $data['phone'];
         $userModel->password = $data['password'];
         $userModel->personid = '';
         $userModel->createtime = $data['createtime'];
         $userModel->openfire = $data['openfire'];
-        $userModel->person_front_pic = $data['personForntPic'];
-        $userModel->person_back_pic = $data['personBackPic'];
+        //$userModel->person_front_pic = $data['personFrontPic'];
+        //$userModel->person_back_pic = $data['personBackPic'];
         $flag1 = $userModel->save();
 
+        //插入信息到账户表
         $accountModel = new AccountModel();
         $accountModel->uid = $userModel->uid;
         $flag2 = $accountModel->save();
@@ -145,6 +147,8 @@ class DoRegisterV1 extends ServiceAbstract
 //        }
 
         DB::commit();
+
+        /* 注册成功后暂时无须注释中的代码，待1.1.0版测试没问题，确定不需要再删除
         $result = callService('user.getInfoV1', ['userid' => $userModel->uid]);
         if ($result['code'] != 0) {
             $this->error('IM注册失败');
@@ -155,11 +159,21 @@ class DoRegisterV1 extends ServiceAbstract
 
         //用户登录token
         $return['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
+        */
 
-        //设置用户信息到openVpn
-        User::setInfoToOpenVpn($userModel->uid, $return['token'], $userModel->traffic_patterns, $userModel->allow_external_updates, $this->_params['_apiHeaders']);
+        //插入信息到审核队列
+        $userRegisterCheckModel = new UserRegisterCheckModel();
+        $userRegisterCheckModel->uid = $userModel->uid;
+        $userRegisterCheckModel->status = 1;
+        $userRegisterCheckModel->created_at = time();
+        $userRegisterCheckModel->save();
 
-        return $this->response($return);
+        $token = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
+
+        return $this->response([
+            'uid'   => $userModel->uid,
+            'token' => $token,
+        ]);
     }
 
     /**

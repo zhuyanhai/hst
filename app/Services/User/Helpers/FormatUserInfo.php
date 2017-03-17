@@ -25,6 +25,7 @@ class FormatUserInfo
             foreach ($userModelList as $k=>$v) {
                 $tmp = array();
                 $tmp['uid'] = $v['uid'];
+                $tmp['isRegisterCheck'] = $v['is_register_check'];
                 $tmp['sort'] = $v['sort'];
                 $tmp['phone'] = $v['phone'];
                 unset($tmp['password']);

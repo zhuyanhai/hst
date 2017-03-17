@@ -40,6 +40,17 @@ class RouteServiceProvider extends ServiceProvider
 
         //$this->mapWebRoutes();
 
+
+        //临时上传
+        Route::group(['namespace' => $this->namespace . '\Upload', 'prefix' => 'upload'], function ()
+        {
+            Route::any('/personFrontPic/process', 'PersonFrontPicController@process');
+        });
+
+
+        //Route::any('/upload/personFrontPic/process', 'Upload\PersonFrontPicController@process');
+
+
         //自定义API路由 allen
         Route::group(['namespace' => $this->namespace, 'prefix' => 'api'], function ()
         {
