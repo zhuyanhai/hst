@@ -39,6 +39,7 @@ class PersonFrontPicV1Controller extends ApiController
      */
     public function run(Request $request)
     {
+        $a = file_get_contents('php://input', 'r');
         if ($request->hasFile('Filedata')) {
             $userid = $this->_params['userid'];
             $useridMd5 = md5($userid);

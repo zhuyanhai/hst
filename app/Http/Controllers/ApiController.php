@@ -74,6 +74,13 @@ abstract class ApiController extends BaseController
      */
     protected $foreLogin = true;
 
+    /**
+     * 当前登录用户
+     *
+     * @var array
+     */
+    protected $loginUserInfo = null;
+
 
     /**
      * 错误码
@@ -136,9 +143,10 @@ abstract class ApiController extends BaseController
                 return $this->error('', 4000)->response();
             }
             $result = callService('user.checkLoginV1', ['token'=>$this->_headers['hst-token'][0]]);
-
             if ($result['code'] != 0) {
                 return $this->error('', 4000);
+            } else {
+                $this->loginUserInfo = $result['data'];
             }
         }
 

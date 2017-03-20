@@ -40,7 +40,6 @@ class CheckLoginV1 extends ServiceAbstract
     public function run()
     {
         $userid = LoginToken::stripUserid($this->_params['token']);
-        file_put_contents('/tmp/iio',$userid.PHP_EOL, 8);
 
         $userModel = User::getBaseInfoByUserid($userid);
 
@@ -52,7 +51,7 @@ class CheckLoginV1 extends ServiceAbstract
 
 
         if (intval($userModel->frozen) !== 1) {
-            $this->response();
+            return $this->response($userModel->toArray());
         } else {
             $this->error('该用户已被冻结');
         }
