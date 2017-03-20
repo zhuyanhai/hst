@@ -6,7 +6,7 @@ use App\Services\ServiceAbstract;
 use App\Services\User\Helpers\User;
 
 /**
- * 设置用户省流量模式
+ * 设置用户身份证照片（正反面两张），实名认证使用
  *
  * 版本号：v1
  *
