@@ -135,7 +135,7 @@ abstract class ApiController extends BaseController
             if (!isset($this->_headers['hst-token'])) {
                 return $this->error('', 4000)->response();
             }
-            $result = callService('user.checkLoginV1', $this->_headers['hst-token']);
+            $result = callService('user.checkLoginV1', ['token'=>$this->_headers['hst-token'][0]]);
 
             if ($result['code'] != 0) {
                 return $this->error('', 4000);
@@ -164,12 +164,12 @@ abstract class ApiController extends BaseController
         ];
         //header校验错误信息对照表
         $messagesOfHeader = [
-            'hst_bundleid.required' => '9001',
-            'hst_system.required' => '9002',
-            'hst_devicemac.required' => '9003',
-            'hst_package.required' => '9004',
-            'hst_version.required' => '9005',
-            'hst_version.required' => '9005',
+            'hst-bundleid.required' => '9001',
+            'hst-system.required' => '9002',
+            'hst-devicemac.required' => '9003',
+            'hst-package.required' => '9004',
+            'hst-version.required' => '9005',
+            'hst-version.required' => '9005',
             'hst-appid.required' => '9006',
         ];
 
@@ -179,7 +179,7 @@ abstract class ApiController extends BaseController
         }
 
         //赋值对象
-        $this->appId = $this->_headers['hst-appid'];
+        $this->appId = $this->_headers['hst-appid'][0];
 
         //appid校验
         //$appModel = AppModel::where('app_id', $this->appId)->first();

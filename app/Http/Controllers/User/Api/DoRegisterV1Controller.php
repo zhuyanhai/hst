@@ -67,7 +67,7 @@ class DoRegisterV1Controller extends ApiController
         }
 
         $result['cookies'] = [
-            ['hst_token' => $result['data']['token']],
+            'hst_token' => $result['data']['token'],
         ];
 
         return $this->response($result['data'], $result['cookies']);

@@ -40,6 +40,7 @@ class CheckLoginV1 extends ServiceAbstract
     public function run()
     {
         $userid = LoginToken::stripUserid($this->_params['token']);
+        file_put_contents('/tmp/iio',$userid.PHP_EOL, 8);
 
         $userModel = User::getBaseInfoByUserid($userid);
 
