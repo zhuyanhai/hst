@@ -67,6 +67,13 @@ abstract class ApiController extends BaseController
      */
     protected $isH5Request = false;
 
+    /**
+     * 定义接口必须登录才可以被访问
+     *
+     * @var bool true＝必须登录 false＝可以不登陆就访问
+     */
+    protected $foreLogin = true;
+
 
     /**
      * 错误码
@@ -81,7 +88,7 @@ abstract class ApiController extends BaseController
         '500' => '服务器异常',
 
         //指定有意义的错误段 4000 - 4999
-
+        '4000' => '您处于未登陆状态，请先登录！',
 
         // 公共错误码
         '1001' => '[appId]缺失',
@@ -122,6 +129,18 @@ abstract class ApiController extends BaseController
 
         //请求头校验
         $this->headerValidate();
+
+        //检测是否必须登录
+        if ($this->foreLogin) {//必须登录
+            if (!isset($this->_headers['hst-token'])) {
+                return $this->error('', 4000)->response();
+            }
+            $result = callService('user.checkLoginV1', $this->_headers['hst-token']);
+
+            if ($result['code'] != 0) {
+                return $this->error('', 4000);
+            }
+        }
 
         //请求参数校验
         $this->paramsValidate();
@@ -175,6 +194,7 @@ abstract class ApiController extends BaseController
 //        if (! $signRes || ! $signRes['status']) {
 //            return $this->response(['status' => false, 'code' => $signRes['code']]);
 //        }
+
     }
 
     /**

@@ -83,6 +83,8 @@ class DoLoginV1 extends ServiceAbstract
                         'token'       => $result['data']['token'],
                         'checkStatus' => $checkStatus,
                     ], $result['cookies']);
+                } else {
+                    $result['data']['checkStatus'] = 3;//
                 }
 
                 return $this->response($result['data'], $result['cookies']);

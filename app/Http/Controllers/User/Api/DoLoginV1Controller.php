@@ -15,6 +15,13 @@ use App\Http\Controllers\ApiController;
 class DoLoginV1Controller extends ApiController
 {
     /**
+     * 定义接口必须登录才可以被访问
+     *
+     * @var bool true＝必须登录 false＝可以不登陆就访问
+     */
+    protected $foreLogin = false;
+
+    /**
      * 校验请求参数
      *
      * true = 校验通过 false=校验不通过

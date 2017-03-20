@@ -2,6 +2,7 @@
 
 namespace App\Services\User\Helpers;
 
+use App\Libraries\Utils;
 
 /**
  * 用户登录token 生成、检测
@@ -27,7 +28,8 @@ class LoginToken
      */
     public static function build($userid, $account, $password, $createtime)
     {
-        return strtoupper(md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime));
+        $useridStr = Utils\Mid::id2URL($userid);
+        return strtoupper(md5(md5(self::SECRET_KEY . $userid . $account) . $password . $createtime)).$useridStr;
     }
 
     /**
@@ -47,6 +49,19 @@ class LoginToken
             return true;
         }
         return false;
+    }
+
+    /**
+     * 返回从token中剥离出来的用户id
+     *
+     * @param $token
+     * @return int
+     */
+    public static function stripUserid($token)
+    {
+        $useridStr = mb_substr($token, 32);
+        $userid = Utils\Mid::url2ID($useridStr);
+        return $userid;
     }
 
 }
