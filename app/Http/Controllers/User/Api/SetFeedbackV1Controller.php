@@ -23,12 +23,15 @@ class SetFeedbackV1Controller extends ApiController
     protected function paramsValidate()
     {
         return $this->_validate($this->_params, [
-            'contentType' => 'required',
-            'contents'    => 'required',
+            'contentType' => 'required|integer',
+            'contents'    => 'required|string|max:140',
 
         ], [
             'contentType.required'  => '参数contentType丢失',
+            'contentType.integer'  => '参数contentType丢失',
             'contents.required'  => '参数contents丢失',
+            'contents.string'  => '参数contents丢失',
+            'contents.max'  => '内容必须小于140字',
         ]);
     }
 

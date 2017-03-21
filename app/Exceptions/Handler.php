@@ -53,7 +53,7 @@ class Handler extends ExceptionHandler
                 ],
                 'data' => new \stdClass(),
                 'cookies' => new \stdClass(),
-            ]);
+            ], 200, ['Access-Control-Allow-Credentials'=>'true', 'Access-Control-Allow-Origin'=>'*']);
         }
         return parent::render($request, $exception);
     }
