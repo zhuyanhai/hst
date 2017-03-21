@@ -48,28 +48,19 @@ class DoStartupV1Controller extends ApiController
             $this->error('参数错误');
         }
 
+        //当前写死下载url，后期开发后台配置app更新
+
         $return = [
+            'versionCheck' => [
+                'version'     => '1.1.0',
+                'title'       => '有新版本',
+                'content'     => '有新版本',
+                'downloadUrl' => 'http://hst.bxshare.cn/',
+            ],
             'openVpn' => [
                 'certificateUrl' => 'http://hst.bxshare.cn/storage/openvpn_certificate/private.ovpn?v=20170318',
             ],
-            'registerProtocol' => 'http://hst.bxshare.cn/storage/register_protocol?v=20170318',
         ];
-
-        //当前写死下载url，后期开发后台配置app更新
-        if ($this->_params['patterns'] == 'start') {//大启动
-            $result = callService('foundation.checkAppVersionV1', [
-                'systemType' => $this->_headers['hst-system'][0],
-                'appMark'    => 'haishangtong',
-                'packageName'=> $this->_headers['hst-package'][0],
-                'version'    => $this->_headers['hst-version'][0],
-            ]);
-
-            if ($result['code'] != 0) {
-                $this->error($result['msg']);
-            }
-
-            $return['versionCheck'] = $result['data'];
-        }
 
         return $this->response($return);
 

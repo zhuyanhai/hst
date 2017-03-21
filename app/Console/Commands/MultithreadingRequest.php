@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\ClientException;
+use Symfony\Component\DomCrawler\Crawler;
 
 class MultithreadingRequest extends Command
 {
@@ -60,6 +61,16 @@ class MultithreadingRequest extends Command
             'concurrency' => $this->concurrency,
             'fulfilled'   => function ($response, $index)
             {
+                $html = $response->getBody()->getContents();
+                $crawler = new Crawler();
+                $crawler->addHtmlContent($html);
+
+                $crawler = $crawler
+                    ->filter('body > p')
+                    ->reduce(function (Crawler $node, $i) {
+                        // filter every other node
+                        return ($i % 2) == 0;
+                    });
 
                 file_put_contents('/tmp/op', $response->getBody()->getContents().PHP_EOL.PHP_EOL, 8);
                 $res = json_decode($response->getBody()->getContents());
