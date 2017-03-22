@@ -55,7 +55,11 @@ class GetWeatherForecastV1 extends ServiceAbstract
             }
         } else {
             $weatherForecastModel = WeatherForecastModel::where('dates', $dates)->get(['id', 'type', 'fishery_name', 'contents']);
-            return $this->response($weatherForecastModel->toArray());
+            $list = $weatherForecastModel->toArray();
+            foreach ($list as &$v) {
+                $v['contents'] = preg_replace("%\\r%", '', $v['contents']);
+            }
+            return $this->response($list);
         }
 
     }

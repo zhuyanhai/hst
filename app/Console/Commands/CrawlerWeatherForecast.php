@@ -23,11 +23,8 @@ class CrawlerWeatherForecast extends Command
      *
      * @var string
      */
-    protected $description = '多线程抓包';
+    protected $description = '天气预报爬取脚本';
 
-    private $totalPageCount = 1;
-    private $counter        = 1;
-    private $concurrency    = 1;  // 同时并发抓取
 
     /**
      * Create a new command instance.
