@@ -32,11 +32,23 @@ class GetWeatherForecastV1Controller extends ApiController
      */
     public function run()
     {
+        //如果指定日期没有是否上一个的
+        if (!isset($this->_params['isPrev'])) {
+            $isPrev = 0;
+        } else {
+            $this->_validate($this->_params, [
+                'isPrev' => 'integer',
+            ], [
+                'isPrev.integer' => '参数isPrev错误'
+            ]);
+            $isPrev = 1;
+        }
+
         if (!isset($this->_params['dates'])) {
             $dates = date('Ymd');
         } else {
             $this->_validate($this->_params, [
-                'dates' => 'date_format:yyyy-mm-dd',
+                'dates' => 'date_format:Y-m-d',
             ], [
                 'dates.date_format' => '日期参数格式错误，正确格式：2017-01-01'
             ]);
@@ -44,7 +56,7 @@ class GetWeatherForecastV1Controller extends ApiController
             $dates = preg_replace('%-%i', '', $this->_params['dates']);
         }
 
-        $result = callService('foundation.GetWeatherForecastV1', ['isCheck' => 0, 'dates' => $dates]);
+        $result = callService('foundation.GetWeatherForecastV1', ['isCheck' => 0, 'isPrev' => $isPrev, 'dates' => $dates]);
 
         if ($result['code'] != 0) {
             $this->error($result['msg']);

@@ -135,19 +135,19 @@ abstract class ApiController extends BaseController
         }
 
         //请求头校验
-        //$this->headerValidate();
+        $this->headerValidate();
 
         //检测是否必须登录
         if ($this->foreLogin) {//必须登录
-//            if (!isset($this->_headers['hst-token'])) {
-//                return $this->error('', 4000)->response();
-//            }
-//            $result = callService('user.checkLoginV1', ['token'=>$this->_headers['hst-token'][0]]);
-//            if ($result['code'] != 0) {
-//                return $this->error('', 4000);
-//            } else {
-//                $this->loginUserInfo = $result['data'];
-//            }
+            if (!isset($this->_headers['hst-token'])) {
+                return $this->error('', 4000)->response();
+            }
+            $result = callService('user.checkLoginV1', ['token'=>$this->_headers['hst-token'][0]]);
+            if ($result['code'] != 0) {
+                return $this->error('', 4000);
+            } else {
+                $this->loginUserInfo = $result['data'];
+            }
         }
 
         //请求参数校验
