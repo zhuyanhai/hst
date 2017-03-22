@@ -52,7 +52,7 @@ class DoStartupV1Controller extends ApiController
             'openVpn' => [
                 'certificateUrl' => 'http://hst.bxshare.cn/storage/openvpn_certificate/private.ovpn?v=20170318',
             ],
-            'registerProtocol' => 'http://hst.bxshare.cn/storage/register_protocol?v=20170318',
+            'registerProtocol' => 'http://hst.bxshare.cn/storage/register_protocol?v=20170319',
         ];
 
         //当前写死下载url，后期开发后台配置app更新

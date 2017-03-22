@@ -123,7 +123,6 @@ class DoRegisterV1 extends ServiceAbstract
         $flag2 = $accountModel->save();
 
         if (!$flag1 || !$flag2) {
-            DB::rollBack();
             $this->error('IM注册失败');
         }
 

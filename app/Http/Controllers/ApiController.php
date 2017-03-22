@@ -252,7 +252,7 @@ abstract class ApiController extends BaseController
 
         return response()->json([
             'state' => [
-                "code" => 33,// 0=成功 非0=失败
+                "code" => 0,// 0=成功 非0=失败
                 "msg" => '',//失败理由
             ],
             'data' => $return['data'],
