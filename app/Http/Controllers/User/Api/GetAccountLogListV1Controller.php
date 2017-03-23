@@ -37,7 +37,8 @@ class GetAccountLogListV1Controller extends ApiController
      */
     public function run()
     {
-        $result = callService('user.getAccountLogListV1', ['userid' => $this->loginUserInfo['uid'], 'mode' => $this->_params['mode']]);
+        $this->_params['userid'] = $this->loginUserInfo['uid'];
+        $result = callService('user.getAccountLogListV1', $this->_params);
 
         if ($result['code'] != 0) {
             $this->error($result['msg']);

@@ -69,8 +69,8 @@ class GetAccountLogListV1 extends ServiceAbstract
     private function _getUserPaySuccess($userModel)
     {
         $id = 0;
-        if (isset($this->_params['id'])) {
-            $id = intval($this->_params['id']);
+        if (isset($this->_params['lastId'])) {
+            $id = intval($this->_params['lastId']);
         }
         //每页需要数量
         $pageCount = 20;
