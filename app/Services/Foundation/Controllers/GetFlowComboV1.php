@@ -6,7 +6,7 @@ use App\Services\ServiceAbstract;
 use App\Services\Foundation\Models\FlowModel;
 
 /**
- * 获取流量包套餐列表
+ * 获取单个流量包套餐信息
  *
  * 版本号：v1
  *
@@ -23,7 +23,12 @@ class GetFlowComboV1 extends ServiceAbstract
      */
     public function paramsValidate()
     {
-        return true;
+        return $this->_validate($this->_params, [
+            'id' => 'required|integer',
+        ], [
+            'id.required' => '参数id丢失',
+            'id.integer' => '参数id丢失',
+        ]);
     }
 
     /**
@@ -33,11 +38,10 @@ class GetFlowComboV1 extends ServiceAbstract
      */
     public function run()
     {
-
-        $flowModelList = FlowModel::where('id', '<=', 9)->get();
-        if ($flowModelList->count() > 0) {
-            return $this->response($flowModelList->toArray());
+        $flowModel = FlowModel::where('id', $this->_params['id'])->first();
+        if (!$flowModel) {
+            return $this->error('获取单个流量宝套餐信息失败');
         }
-        return $this->response();
+        return $this->response($flowModel->toArray());
     }
 }

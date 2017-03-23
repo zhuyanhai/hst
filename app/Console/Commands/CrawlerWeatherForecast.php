@@ -46,6 +46,7 @@ class CrawlerWeatherForecast extends Command
         $result = callService('foundation.getWeatherForecastV1', [
             'dates'   => date('Y-m-d'),
             'isCheck' => 1,
+            'isPrev'  => 0,
         ]);
 
         if ($result['data']['isCrawler'] > 0) {

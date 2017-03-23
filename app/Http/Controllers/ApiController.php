@@ -164,7 +164,7 @@ abstract class ApiController extends BaseController
      */
     protected function headerValidate()
     {
-        if (isset($this->_headers['hst-system']) && !in_array($this->_headers['hst-system'], ['android','iphone'])) {
+        if (isset($this->_headers['hst-system']) && !in_array($this->_headers['hst-system'][0], ['android','iphone'])) {
             $this->isH5Request = true;
             return true;
         }

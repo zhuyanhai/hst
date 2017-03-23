@@ -61,4 +61,17 @@ class User
         }
     }
 
+    /**
+     * 通知路由器取消限速
+     */
+    public static function pushFlowLimitCancel($userid, $phone)
+    {
+        //获取用户所在的所有船id(在线)
+        $result = callService('ship.getOnlineUserSidV1', ['userid' => $userid]);
+        if ($result['code'] != 0) {
+            return false;
+        }
+
+
+    }
 }

@@ -9,10 +9,10 @@ use App\Http\Controllers\ApiController;
  *
  * 版本号：v1
  *
- * Class getFlowComboV1Controller
+ * Class getFlowComboListV1Controller
  * @package App\Http\Controllers\Foundation\Api
  */
-class getFlowComboV1Controller extends ApiController
+class getFlowComboListV1Controller extends ApiController
 {
     /**
      * 校验请求参数
@@ -32,7 +32,7 @@ class getFlowComboV1Controller extends ApiController
      */
     public function run()
     {
-        $result = callService('foundation.getFlowComboV1', $this->_params);
+        $result = callService('foundation.getFlowComboListV1', $this->_params);
 
         if ($result['code'] != 0) {
             $this->error($result['msg']);
