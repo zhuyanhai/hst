@@ -130,15 +130,18 @@ abstract class ApiController extends BaseController
     {
         $this->_params  = $request->all();
         $this->_headers = $request->header();
-        if (isset($this->_params['jsoncallback'])) {
+        //if (isset($this->_params['jsoncallback'])) {
+        if (isset($this->_params['p'])) {//临时
             $this->isH5Request = true;
         }
 
         //请求头校验
-        $this->headerValidate();
+        if (!$this->isH5Request) {
+            $this->headerValidate();
+        }
 
         //检测是否必须登录
-        if ($this->foreLogin) {//必须登录
+        if ($this->foreLogin && !$this->isH5Request) {//必须登录
             if (!isset($this->_headers['hst-token'])) {
                 return $this->error('', 4000)->response();
             }
@@ -161,6 +164,11 @@ abstract class ApiController extends BaseController
      */
     protected function headerValidate()
     {
+        if (isset($this->_headers['hst-system']) && !in_array($this->_headers['hst-system'], ['android','iphone'])) {
+            $this->isH5Request = true;
+            return true;
+        }
+
         //header校验规则
         $rulesOfHeader = [
             'hst-bundleid' => 'required',
@@ -240,7 +248,7 @@ abstract class ApiController extends BaseController
             'todaySavedFlow' => 5,//今日已省流量
         ];
 
-        if ($this->isH5Request) {//h5
+        if ($this->isH5Request && isset($this->params['jsoncallback'])) {//h5
             $responseObj = response()->jsonp($this->params['jsoncallback'], $return['data']);
             if (!empty($cookies)) {
                 foreach ($cookies as $cookie) {

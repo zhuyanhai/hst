@@ -78,7 +78,7 @@ class GetWeatherForecastV1 extends ServiceAbstract
             $year  = mb_substr($dates, 0, 4);
             $month = mb_substr($dates, 4, 2);
             $day   = mb_substr($dates, 6, 2);
-            return $this->response(['date' => mktime(0,0,0,$month, $day, $year), 'weatherList' => $list]);
+            return $this->response(['date' => mktime(0,0,0,$month, $day, $year).'000', 'weatherList' => $list]);
         }
 
     }

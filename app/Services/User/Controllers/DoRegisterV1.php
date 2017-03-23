@@ -113,8 +113,6 @@ class DoRegisterV1 extends ServiceAbstract
         $userModel->personid = '';
         $userModel->createtime = $data['createtime'];
         $userModel->openfire = $data['openfire'];
-        //$userModel->person_front_pic = $data['personFrontPic'];
-        //$userModel->person_back_pic = $data['personBackPic'];
         $flag1 = $userModel->save();
 
         //插入信息到账户表
@@ -123,7 +121,8 @@ class DoRegisterV1 extends ServiceAbstract
         $flag2 = $accountModel->save();
 
         if (!$flag1 || !$flag2) {
-            $this->error('IM注册失败');
+            DB::rollBack();
+            $this->error('注册失败');
         }
 
         //注册Openfire
@@ -145,7 +144,6 @@ class DoRegisterV1 extends ServiceAbstract
 //            return showData(new \stdClass(), 'voip注册失败', 1);
 //        }
 
-        DB::commit();
 
         /* 注册成功后暂时无须注释中的代码，待1.1.0版测试没问题，确定不需要再删除
         $result = callService('user.getInfoV1', ['userid' => $userModel->uid]);
@@ -165,7 +163,14 @@ class DoRegisterV1 extends ServiceAbstract
         $userRegisterCheckModel->uid = $userModel->uid;
         $userRegisterCheckModel->status = 1;
         $userRegisterCheckModel->created_at = time();
-        $userRegisterCheckModel->save();
+        $flag3 = $userRegisterCheckModel->save();
+
+        if (!$flag3) {
+            DB::rollBack();
+            $this->error('注册失败');
+        }
+
+        DB::commit();
 
         $token = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
 

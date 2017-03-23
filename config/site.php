@@ -4,4 +4,5 @@ return [
         'ip' => '139.199.200.81',
         'port' => 6090,
     ],
+    'appCode' => '&%&aicall$#$', //icall api密匙
 ];

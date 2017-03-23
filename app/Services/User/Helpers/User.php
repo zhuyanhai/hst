@@ -60,4 +60,5 @@ class User
             //todo log系统
         }
     }
+
 }
