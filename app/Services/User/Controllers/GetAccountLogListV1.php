@@ -81,13 +81,13 @@ class GetAccountLogListV1 extends ServiceAbstract
         if ($id > 0) {
             $selector->where('id', '<', $id);
         }
-        $accountLogModel = $selector->where('status', 2)->limit($count)->get([
+        $accountLogModel = $selector->where('status', 2)->limit($count)->orderBy('id', 'desc')->get([
             'id', 'payment', 'recharge_time', 'cbid', 'jine'
         ]);
 
         $return = [
             'lastId' => 0,
-            'isEnd'  => 1,
+            'isEnd'  => 0,
             'list'   => [],
         ];
         if ($accountLogModel->count() > 0) {
@@ -106,26 +106,41 @@ class GetAccountLogListV1 extends ServiceAbstract
                 }
             }
 
+            if ($accountLogModel->count() <= $pageCount) {
+                $return['isEnd'] = 1;
+            }
+
             $i = 0;
             foreach ($accountLogModel as $v) {
-                if ($i > $pageCount) {
-                    $return['isEnd'] = 0;
+
+                if ($i >= $pageCount) {
                     break;
                 }
 
                 $payment = ($v->payment == 1)?'支付宝':($v->payment == 2)?'微信':'充值卡';
+
+                $jine = (float)0;
+                if ($v->cbid > 0) {
+                    if (!empty($cbResult['data']) && isset($cbResult['data'][$v->cbid])) {
+                        $jine = (float)$cbResult['data'][$v->cbid]['price'];
+                    } else {
+                        $jine = (float)0;
+                    }
+                } else {
+                    $jine = (float)$v->jine;
+                }
                 array_push($return['list'], [
                     'id'      => $v->id,
                     'payment' => $payment,
-                    'jine'    => ($v->cbid > 0)?((!empty($cbResult['data']) && isset($cbResult['data'][$v->cbid]))
-                        ?$cbResult['data'][$v->cbid]['price']:0)
-                :$v->jine,
+                    'jine'    => $jine,
                     'phone'   => $userModel->phone,
                     'time'    => (empty($v->recharge_time))?0:date('Y/m/d', $v->recharge_time),
                 ]);
                 $return['lastId'] = $v->id;
                 $i++;
             }
+        } else {
+            $return['isEnd'] = 1;
         }
 
         return $this->response($return);
