@@ -51,9 +51,9 @@ class GetFlowInfoV1 extends ServiceAbstract
             //用户当前剩余总流量 KB
             'flowLeft'    => (float)(($accountModel->flowleft < 0)?0:$accountModel->flowleft),
             //用户当天使用流量 KB
-            'dayCostFlow' => $accountModel->dcost,
+            'dayCostFlow' => (float)$accountModel->dcost,
             //用户当天省流量 KB
-            'daySaveFlow' => $accountModel->dsave,
+            'daySaveFlow' => (float)$accountModel->dsave,
         ]);
     }
 }
