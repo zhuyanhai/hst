@@ -66,6 +66,20 @@ return [
             'engine' => null,
         ],
 
+        'mysql_aps' => [
+            'driver'   => 'mysql',
+            'host'     => env('DB_HOST_CENTER', 'localhost;unix_socket=/tmp/mysql.sock'),
+            'port'     => env('DB_PORT_CENTER', '3306'),
+            'database' => env('DB_DATABASE_CENTER', 'aps'),
+            'username' => env('DB_USERNAME_CENTER', 'appuser'),
+            'password' => env('DB_PASSWORD_CENTER', '19820111x'),
+            'charset'  => 'utf8mb4',
+            'collation'=> 'utf8mb4_general_ci',
+            'prefix'   => '',
+            'strict'   => true,
+            'engine'   => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),

@@ -142,24 +142,30 @@ class DoRegisterV1 extends ServiceAbstract
         }
 
         //注册icall 第二版再加上
-//        $iCallResult = callService('foundation.doICallV1', [
-//            'action' => 'registerUser',
-//            'data'   => [
-//                'phone'      => $userModel->phone,
-//                'password'   => $userModel->password,
-//                'systemType' => $this->_params['_apiHeaders']['hst-system'][0],
-//            ]
-//        ]);
-//        if ($iCallResult['code'] != 0 || $iCallResult['data']['result'] != 0) {
-//            DB::rollBack();
-//            //$iMod->deleUser($data['phone'], 'phone');
-//            callService('foundation.doOpenfireV1', [
-//                'who'    => 'openfire',
-//                'action' => 'deleteUser',
-//                'data'   => ['username' => $userModel->uid]
-//            ]);
-//            $this->error('voip注册失败');
-//        }
+        $iCallResult = callService('foundation.doICallV1', [
+            'action' => 'registerUser',
+            'data'   => [
+                'phone'      => $userModel->phone,
+                'password'   => $userModel->password,
+                'systemType' => $this->_params['_apiHeaders']['hst-system'][0],
+            ]
+        ]);
+
+        if ($iCallResult['code'] != 0 || $iCallResult['data']['result'] != 0) {
+            DB::rollBack();
+            callService('foundation.doICallV1', [
+                'action' => 'deleteUser',
+                'data'   => [
+                    'phone' => $userModel->phone,
+                ]
+            ]);
+            callService('foundation.doOpenfireV1', [
+                'who'    => 'openfire',
+                'action' => 'deleteUser',
+                'data'   => ['username' => $userModel->uid]
+            ]);
+            $this->error('voip注册失败');
+        }
 
         //插入信息到审核队列
         $userRegisterCheckModel = new UserRegisterCheckModel();

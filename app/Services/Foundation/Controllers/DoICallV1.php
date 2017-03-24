@@ -3,6 +3,9 @@
 namespace App\Services\Foundation\Controllers;
 
 use App\Services\ServiceAbstract;
+use App\Services\Foundation\Models\Aps\Aps_UserModel;
+use App\Services\Foundation\Models\Aps\Aps_VFieldModel;
+use App\Services\Foundation\Models\Aps\Aps_FieldAccountModel;
 
 /**
  * 与 voip 通信
@@ -39,7 +42,8 @@ class DoICallV1 extends ServiceAbstract
     ];
 
     private $_actionMaps = [
-        'registerUser'   => '_registerUser',
+        'registerUser' => '_registerUser',
+        'deleteUser'   => '_deleteUser',
     ];
 
     /**
@@ -54,14 +58,13 @@ class DoICallV1 extends ServiceAbstract
         }
 
         $method = $this->_actionMaps[$this->_params['action']];
-        $result = $this->$method();
-        return $this->response($result);
+        return $this->$method();
     }
 
     /**
      * 注册到 voip
      *
-     * @return array 1-注册成功 0-注册失败 -1-用户已注册
+     * @return array
      */
     private function _registerUser()
     {
@@ -72,6 +75,32 @@ class DoICallV1 extends ServiceAbstract
         $url 	  = config('site.iCallUrl') . '?phone='.$phone.'&pwd='.$password.'&agent_id=1&sign='.$code.'&v=3&pv='.$pv;
         $result = json_decode(file_get_contents($url),true);
         return $this->response($result);
+    }
+
+    /**
+     * 删除 voip 用户
+     *
+     * @return array
+     */
+    private function _deleteUser()
+    {
+        $phone = $this->_params['data']['phone'];
+
+        $model = Aps_UserModel::where('long_name', $phone)->first(['field_id']);
+
+        DB::beginTransaction();
+
+        $flag1 = Aps_FieldAccountModel::where('field_id', $model->field_id)->delete();
+        $flag2 = Aps_VFieldModel::where('field_id', $model->field_id)->delete();
+        $flag3 = Aps_UserModel::where('field_id', $model->field_id)->delete();
+
+        if ($flag1 && $flag2 && $flag3) {
+            DB::commit();
+            return $this->response();
+        } else {
+            DB::rollBack();
+            $this->error('voip删除用户操作失败');
+        }
     }
 
     /**
