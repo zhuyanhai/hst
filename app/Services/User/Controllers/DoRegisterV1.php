@@ -141,14 +141,24 @@ class DoRegisterV1 extends ServiceAbstract
             $this->error('openFire注册失败');
         }
 
-        //注册icall
-//        $iBack = iCallRegist($data['phone'], $pwdForIcall, I('pv'));//pv=iphone/android
-//        $flag4 = $iBack['result'] == '0' ? true : false;
-//        if (!$flag4) {
-//            $this->rollback();
-//            $iMod->deleUser($data['phone'], 'phone');
-//            $openfire->delete($uid);
-//            return showData(new \stdClass(), 'voip注册失败', 1);
+        //注册icall 第二版再加上
+//        $iCallResult = callService('foundation.doICallV1', [
+//            'action' => 'registerUser',
+//            'data'   => [
+//                'phone'      => $userModel->phone,
+//                'password'   => $userModel->password,
+//                'systemType' => $this->_params['_apiHeaders']['hst-system'][0],
+//            ]
+//        ]);
+//        if ($iCallResult['code'] != 0 || $iCallResult['data']['result'] != 0) {
+//            DB::rollBack();
+//            //$iMod->deleUser($data['phone'], 'phone');
+//            callService('foundation.doOpenfireV1', [
+//                'who'    => 'openfire',
+//                'action' => 'deleteUser',
+//                'data'   => ['username' => $userModel->uid]
+//            ]);
+//            $this->error('voip注册失败');
 //        }
 
         //插入信息到审核队列

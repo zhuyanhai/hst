@@ -7,6 +7,8 @@ use App\Services\ServiceAbstract;
 /**
  * 与 voip 通信
  *
+ * 第二版再做，1.1.0不做
+ *
  * 版本号：v1
  *
  * Class DoICallV1
@@ -63,34 +65,49 @@ class DoICallV1 extends ServiceAbstract
      */
     private function _registerUser()
     {
-        $pwd = get_user_pwd($pwd);
-        $pv = $pv ? $pv : 'android';
-        $code = $code = md5($phone.C('APP_CODE'));
-        $url = C('i_regist').'?phone='.$phone.'&pwd='.$pwd.'&agent_id=1&sign='.$code.'&v=3&pv='.$pv;
-//    return (array)(json_decode(sendHttp($url)));
-        return json_decode(file_get_contents($url),true);
-
         $phone    = $this->_params['data']['phone'];
-        $password = $this->_params['data']['password'];
-        $url 	  = '/plugins/userService/userservice';
+        $password = $this->_getUserPwd($this->_params['data']['password']);
+        $pv       = $this->_params['data']['systemType'];
+        $code     = md5($phone . config('site.appCode'));
+        $url 	  = config('site.iCallUrl') . '?phone='.$phone.'&pwd='.$password.'&agent_id=1&sign='.$code.'&v=3&pv='.$pv;
+        $result = json_decode(file_get_contents($url),true);
+        return $this->response($result);
+    }
 
-        $result = Openfire::doRequest($url, [
-            'type'     => 'add',
-            'username' => $username,
-            'password' => $password,
-        ]);
-
-        file_put_contents('/tmp/aa', $result.PHP_EOL, 8);
-
-        if (preg_match('/ok/', $result)) {
-            $response = 1;
-        } else if (preg_match('/UserAlreadyExistsException/', $result)) {
-            $response = -1;
-        } else {
-            $response = 0;
+    /**
+     * 从icall拿过来的，移位加密算法
+     *
+     * @param string $pwd
+     * @return string
+     */
+    private function _getUserPwd($pwd) {
+        $data = strval($pwd);
+        if(is_null($data) || strlen($data)==0) {
+            return '';
         }
 
-        return ['result' => $response];
+        $dataLen=strlen($data);
+        if($dataLen>12) {
+            $dataLen=20;
+        }
+
+        $ret = '';
+        for($i=0; $i < $dataLen; $i++) {
+            $value = ord($data[$i]);
+            if(($value > 0x60) && ($value < 0x7B)) {
+                $value = $value - 0x20;
+                $value = 0x5A - $value + 0x41;
+            } else if(($value > 0x40) && ($value < 0x5B)) {
+                $value = $value + 0x20;
+                $value = 0x7A - $value + 0x61;
+            } else if(($value >= 0x30) && ($value <= 0x34)) {
+                $value = $value + 0x05;
+            } else if(($value >= 0x35) && ($value <= 0x39)) {
+                $value = $value - 0x05;
+            }
+            $ret .= chr($value);
+        }
+        return $ret;
     }
 
 }
