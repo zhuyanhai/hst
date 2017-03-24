@@ -47,6 +47,7 @@ class SetIdCardPicV1 extends ServiceAbstract
         }
         $userModel->person_front_pic = $this->_params['personFrontPic'];
         $userModel->person_back_pic = $this->_params['personBackPic'];
+        $userModel->is_register_check = 2;//测试临时使用，周一去掉
         $userModel->save();
         return $this->response();
     }
