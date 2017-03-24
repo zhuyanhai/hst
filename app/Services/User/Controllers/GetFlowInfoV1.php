@@ -4,18 +4,21 @@ namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
 use App\Services\User\Models\AccountModel;
+use App\Services\User\Models\FlowCostLogModel;
 
 /**
- * 获取用户最后一次充值的流量
+ * 获取用户流量信息
  *
- * 临时的，1.1.0后续版本要废弃掉
+ * 剩余总流量
+ * 今日已用流量
+ * 今日已省流量
  *
  * 版本号：v1
  *
- * Class CancelFlowLimitV1
+ * Class GetFlowInfoV1
  * @package App\Services\User\Controllers;
  */
-class GetPayFlowV1 extends ServiceAbstract
+class GetFlowInfoV1 extends ServiceAbstract
 {
     /**
      * 校验请求参数
@@ -44,6 +47,13 @@ class GetPayFlowV1 extends ServiceAbstract
             $this->error('账户不存在');
         }
 
-        return $this->response();
+        return $this->response([
+            //用户当前剩余总流量 KB
+            'flowLeft'    => (float)(($accountModel->flowleft < 0)?0:$accountModel->flowleft),
+            //用户当天使用流量 KB
+            'dayCostFlow' => $accountModel->dcost,
+            //用户当天省流量 KB
+            'daySaveFlow' => $accountModel->dsave,
+        ]);
     }
 }
