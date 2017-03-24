@@ -40,7 +40,7 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
     {
         //1M = 1元
 
-        $model = AccountModel::where('userid', $this->_params['userid']);
+        $model = AccountModel::where('uid', $this->_params['userid'])->first(['tsave']);
         if (!$model) {
             $this->error('帐号不存在');
         }
@@ -49,12 +49,12 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
         $yestoday = date("Ymd",strtotime("-1 day"));
         $saveFlowDayModel = AccountSaveFlowDayModel::where('uid', $this->_params['userid'])->where('created_at', $yestoday)->first(['flow']);
         if ($saveFlowDayModel && $saveFlowDayModel->flow > 0) {
-            $yestodaySaveFlow = bcmul($saveFlowDayModel->flow * 1024 * 1024, 0);
+            $yestodaySaveFlow = bcmul($saveFlowDayModel->flow / 1024 / 1024, 0);
         } else {
             $yestodaySaveFlow = '0';
         }
 
-        $tsave = bcmul($model->tsave * 1024, 0);
+        $tsave = bcmul($model->tsave / 1024, 0);
 
         //todo 假数据
         return $this->response([
