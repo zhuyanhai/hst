@@ -3,7 +3,7 @@
 namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
-use App\Services\User\Models\AccountModel;
+use App\Services\User\Models\AccountLogModel;
 
 /**
  * 获取用户最后一次充值的流量
@@ -39,11 +39,36 @@ class GetPayFlowV1 extends ServiceAbstract
      */
     public function run()
     {
-        $accountModel = AccountModel::where('uid', $this->_params['userid'])->first();
-        if (!$accountModel) {
-            $this->error('账户不存在');
+        $accountLogModel = AccountLogModel::where('uid', $this->_params['userid'])->where('status', 2)->orderBy('id', 'desc')->first();
+        if (!$accountLogModel) {
+            $this->error('获取失败');
         }
 
-        return $this->response();
+        $price = null;
+        $flow  = null;
+
+        if ($accountLogModel->cbid > 0) {
+            $cbResult = callService('foundation.GetFlowComboListV1', ['mode' => 'ids', 'ids' => [$accountLogModel->cbid]]);
+            if ($cbResult['code'] == 0 && !empty($cbResult['data'])) {
+                foreach ($cbResult['data'] as $d) {
+                    $price = $d['price'];
+                    $flow  = $d['flow'];
+                }
+            }
+        }
+
+        $cnumData = null;
+        if ($accountLogModel->cnum > 0) {
+            $cnumResult = callService('pay.getCardListV1', ['mode' => 'nums', 'nums' => [$accountLogModel->cnum]]);
+            if ($cnumResult['code'] == 0 && !empty($cnumResult['data'])) {
+                foreach ($cnumResult['data'] as $d) {
+                    $price = $d['price'];
+                    $flow  = $d['flow'];
+                }
+            }
+        }
+
+
+        return $this->response(['flow' => $flow, 'price' => $price]);
     }
 }
