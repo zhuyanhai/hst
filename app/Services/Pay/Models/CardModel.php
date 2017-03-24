@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\User\Models;
+namespace App\Services\Pay\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * 充值卡记录表数据表
  *
  * Class CardModel
- * @package App\Services\User\Models
+ * @package App\Services\Pay\Models
  */
 class CardModel extends Model
 {

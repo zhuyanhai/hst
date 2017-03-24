@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Foundation\Controllers;
+namespace App\Services\Pay\Controllers;
 
 use App\Services\ServiceAbstract;
-use App\Services\User\Models\CardModel;
+use App\Services\Pay\Models\CardModel;
 
 /**
  * 校验app是否需要升级
@@ -11,7 +11,7 @@ use App\Services\User\Models\CardModel;
  * 版本号：v1
  *
  * Class CardRechargeV1
- * @package App\Services\Foundation\Controllers
+ * @package App\Services\Pay\Controllers
  */
 class CardRechargeV1 extends ServiceAbstract
 {

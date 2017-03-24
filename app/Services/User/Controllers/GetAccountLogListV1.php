@@ -82,7 +82,7 @@ class GetAccountLogListV1 extends ServiceAbstract
             $selector->where('id', '<', $id);
         }
         $accountLogModel = $selector->where('status', 2)->limit($count)->orderBy('id', 'desc')->get([
-            'id', 'payment', 'recharge_time', 'cbid', 'jine'
+            'id', 'payment', 'recharge_time', 'cbid', 'jine', 'cnum'
         ]);
 
         $return = [
@@ -93,16 +93,33 @@ class GetAccountLogListV1 extends ServiceAbstract
         if ($accountLogModel->count() > 0) {
 
             $cbidArray = [];
+            $cnumArray = [];
             foreach ($accountLogModel as $v) {
                 if ($v->cbid > 0) {
                     array_push($cbidArray, $v->cbid);
                 }
+                if ($v->cnum > 0) {
+                    array_push($cnumArray, $v->cnum);
+                }
             }
 
+            $cbidData = [];
             if (count($cbidArray) > 0) {
                 $cbResult = callService('foundation.GetFlowComboListV1', ['mode' => 'ids', 'ids' => $cbidArray]);
-                if ($cbResult['code'] != 0 && !empty($cbResult['data'])) {
-                    $cbResult['data'] = Utils\Arrays::toArrayByNewKey($cbResult['data'], 'id');
+                if ($cbResult['code'] == 0 && !empty($cbResult['data'])) {
+                    foreach ($cbResult['data'] as $d) {
+                        $cbidData[$d['id']] = $d['price'];
+                    }
+                }
+            }
+
+            $cnumData = [];
+            if (count($cnumArray) > 0) {
+                $cnumResult = callService('pay.getCardListV1', ['mode' => 'nums', 'nums' => $cnumArray]);
+                if ($cnumResult['code'] == 0 && !empty($cnumResult['data'])) {
+                    foreach ($cnumResult['data'] as $d) {
+                        $cnumData[$d['num']] = $d['price'];
+                    }
                 }
             }
 
@@ -117,12 +134,18 @@ class GetAccountLogListV1 extends ServiceAbstract
                     break;
                 }
 
-                $payment = ($v->payment == 1)?'支付宝':($v->payment == 2)?'微信':'充值卡';
+                $payment = ($v->payment == 1)?'支付宝':(($v->payment == 2)?'微信':'充值卡');
 
                 $jine = (float)0;
                 if ($v->cbid > 0) {
-                    if (!empty($cbResult['data']) && isset($cbResult['data'][$v->cbid])) {
-                        $jine = (float)$cbResult['data'][$v->cbid]['price'];
+                    if (!empty($cbidData) && isset($cbidData[$v->cbid])) {
+                        $jine = (float)$cbidData[$v->cbid];
+                    } else {
+                        $jine = (float)0;
+                    }
+                } elseif($v->cnum > 0) {
+                    if (!empty($cnumData) && isset($cnumData[$v->cnum])) {
+                        $jine = (float)$cnumData[$v->cnum];
                     } else {
                         $jine = (float)0;
                     }
