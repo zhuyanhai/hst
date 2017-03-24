@@ -49,9 +49,9 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
         $yestoday = date("Ymd",strtotime("-1 day"));
         $saveFlowDayModel = AccountSaveFlowDayModel::where('uid', $this->_params['userid'])->where('created_at', $yestoday)->first(['flow']);
         if ($saveFlowDayModel && $saveFlowDayModel->flow > 0) {
-            $yestodaySaveFlow = bcmul($saveFlowDayModel->flow * 1024 * 1024, 0) . 'M';
+            $yestodaySaveFlow = bcmul($saveFlowDayModel->flow * 1024 * 1024, 0);
         } else {
-            $yestodaySaveFlow = '0M';
+            $yestodaySaveFlow = '0';
         }
 
         $tsave = bcmul($model->tsave * 1024, 0);
@@ -59,8 +59,8 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
         //todo 假数据
         return $this->response([
             'yestodaySaveFlow' => $yestodaySaveFlow,
-            'totalSaveFlow'    => $tsave . 'M',
-            'totalSaveMoney'   => $tsave . '元',
+            'totalSaveFlow'    => $tsave,
+            'totalSaveMoney'   => $tsave,
         ]);
 
     }

@@ -22,7 +22,12 @@ class getFlowComboListV1Controller extends ApiController
      */
     protected function paramsValidate()
     {
-        return true;
+        return $this->_validate($this->_params, [
+            'mode'   => 'required|string',
+        ], [
+            'mode.required'  => '参数mode丢失',
+            'mode.string'  => '参数mode丢失',
+        ]);
     }
 
     /**
