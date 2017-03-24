@@ -31,7 +31,7 @@ class GetFlowComboListV1 extends ServiceAbstract
         ]);
     }
 
-    private $_modeMap = [
+    private $_modeMaps = [
         'list' => '_getList',
         'ids'  => '_getByIds',
     ];
@@ -43,11 +43,11 @@ class GetFlowComboListV1 extends ServiceAbstract
      */
     public function run()
     {
-        if (!isset($this->_modeMap[$this->_params['mode']])) {
+        if (!isset($this->_modeMaps[$this->_params['mode']])) {
             $this->error('获取失败');
         }
 
-        $method = $this->_modeMap[$this->_params['mode']];
+        $method = $this->_modeMaps[$this->_params['mode']];
         return $this->$method();
     }
 

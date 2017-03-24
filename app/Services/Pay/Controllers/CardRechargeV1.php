@@ -172,10 +172,10 @@ class CardRechargeV1 extends ServiceAbstract
             }
 
             //取消限速
-//            $cancelResult = callService('user.cancelFlowLimitV1', ['userid' => $userInfo['uid']]);
-//            if ($cancelResult['code'] != 0) {
-//
-//            }
+            $cancelResult = callService('user.cancelFlowLimitV1', ['userid' => $userInfo['uid']]);
+            if ($cancelResult['code'] != 0) {
+
+            }
 
 //            //如果用户在船上，则推送给船上路由器
 //            $apiCtrl = new \Api\Controller\IndexController();

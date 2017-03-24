@@ -52,6 +52,18 @@ class CancelFlowLimitV1 extends ServiceAbstract
             foreach ($result['data'] as $relation) {
                 //todo 等到融云对接上
                 //$apiCtrl->systemToUser(['usrname' => [$userModel->phone]], 27, 's'.$relation['sid']);
+
+                $toId = $to ? $to : $this->routerPushId;
+                $content = array(
+                    'srcMsgQid' =>  $this->srcMsgQid ? $this->srcMsgQid : '',
+                    'user'      =>  array('uid'=>-1),
+                    'type'      =>  $type,
+                    'content'   =>  $content,
+                    'other'     =>  new \stdClass(),
+                    'time'      =>  getLongTime(),
+                );
+                return $this->openFire->message('service', $toId, $content, 'batchusers');
+
             }
         }
 

@@ -36,7 +36,7 @@ class GetAccountLogListV1 extends ServiceAbstract
         ]);
     }
 
-    private $_modeMap = [
+    private $_modeMaps = [
         'user_pay_success' => '_getUserPaySuccess',
     ];
 
@@ -51,11 +51,11 @@ class GetAccountLogListV1 extends ServiceAbstract
         if (!$userModel) {
             $this->error('获取失败');
         }
-        if (!isset($this->_modeMap[$this->_params['mode']])) {
+        if (!isset($this->_modeMaps[$this->_params['mode']])) {
             $this->error('获取失败');
         }
 
-        $method = $this->_modeMap[$this->_params['mode']];
+        $method = $this->_modeMaps[$this->_params['mode']];
         return $this->$method($userModel);
 
     }

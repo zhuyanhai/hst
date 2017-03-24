@@ -99,7 +99,6 @@ class DoRegisterV1 extends ServiceAbstract
         $pwdForIcall = $data['password'];
         $data['password'] = md5($data['password']);
 
-        //$acctM = new Model('account');
         //$openfire = new Openfire();
         //$iMod = new IcallModel(); todo 没有apps库
 
@@ -126,13 +125,21 @@ class DoRegisterV1 extends ServiceAbstract
         }
 
         //注册Openfire
-//        $ret = $openfire->regist($uid, $data['openfire']);
-//        $flag3 = $ret == '1' ? true : false;
-//        if (!$flag3) {
-//            $this->rollback();
-//            $openfire->delete($uid);
-//            return showData(new \stdClass(), 'openFire注册失败', 1);
-//        }
+        $openfireResult = callService('foundation.doOpenfireV1', [
+            'who'    => 'openfire',
+            'action' => 'registerUser',
+            'data'   => ['username' => $userModel->uid, 'password' => $data['openfire']]
+        ]);
+
+        if ($openfireResult['code'] != 0 || $openfireResult['data']['result'] != 1) {
+            DB::rollBack();
+            callService('foundation.doOpenfireV1', [
+                'who'    => 'openfire',
+                'action' => 'deleteUser',
+                'data'   => ['username' => $userModel->uid]
+            ]);
+            $this->error('openFire注册失败');
+        }
 
         //注册icall
 //        $iBack = iCallRegist($data['phone'], $pwdForIcall, I('pv'));//pv=iphone/android
@@ -143,20 +150,6 @@ class DoRegisterV1 extends ServiceAbstract
 //            $openfire->delete($uid);
 //            return showData(new \stdClass(), 'voip注册失败', 1);
 //        }
-
-
-        /* 注册成功后暂时无须注释中的代码，待1.1.0版测试没问题，确定不需要再删除
-        $result = callService('user.getInfoV1', ['userid' => $userModel->uid]);
-        if ($result['code'] != 0) {
-            $this->error('IM注册失败');
-        }
-
-        $return = $result['data'];
-        $return['iuid'] = 22;//$iBack['uid'];
-
-        //用户登录token
-        $return['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
-        */
 
         //插入信息到审核队列
         $userRegisterCheckModel = new UserRegisterCheckModel();

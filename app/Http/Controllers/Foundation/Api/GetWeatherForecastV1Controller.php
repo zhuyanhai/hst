@@ -44,7 +44,7 @@ class GetWeatherForecastV1Controller extends ApiController
             $isPrev = 1;
         }
 
-        if (!isset($this->_params['dates'])) {
+        if (empty($this->_params['dates']) || !isset($this->_params['dates'])) {
             $dates = date('Ymd');
         } else {
             $this->_validate($this->_params, [
