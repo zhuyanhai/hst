@@ -3,6 +3,8 @@
 namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
+use App\Services\User\Models\AccountModel;
+use App\Services\User\Models\AccountSaveFlowDayModel;
 
 /**
  * 获取用户节省流量信息
@@ -38,11 +40,27 @@ class GetSaveFlowInfoV1 extends ServiceAbstract
     {
         //1M = 1元
 
+        $model = AccountModel::where('userid', $this->_params['userid']);
+        if (!$model) {
+            $this->error('帐号不存在');
+        }
+
+        //昨日
+        $yestoday = date("Ymd",strtotime("-1 day"));
+        $saveFlowDayModel = AccountSaveFlowDayModel::where('uid', $this->_params['userid'])->where('created_at', $yestoday)->first(['flow']);
+        if ($saveFlowDayModel && $saveFlowDayModel->flow > 0) {
+            $yestodaySaveFlow = bcmul($saveFlowDayModel->flow * 1024 * 1024, 0) . 'M';
+        } else {
+            $yestodaySaveFlow = '0M';
+        }
+
+        $tsave = bcmul($model->tsave * 1024, 0);
+
         //todo 假数据
         return $this->response([
-            'yestodaySaveFlow' => '13M',
-            'totalSaveFlow' => '300M',
-            'totalSaveMoney' => '50元',
+            'yestodaySaveFlow' => $yestodaySaveFlow,
+            'totalSaveFlow'    => $tsave . 'M',
+            'totalSaveMoney'   => $tsave . '元',
         ]);
 
     }
