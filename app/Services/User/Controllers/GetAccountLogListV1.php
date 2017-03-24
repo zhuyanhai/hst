@@ -73,9 +73,9 @@ class GetAccountLogListV1 extends ServiceAbstract
             $id = intval($this->_params['lastId']);
         }
         //每页需要数量
-        $pageCount = 20;
+        $pageCount = 10;
         //实际获取数量，为判断是否到达末页，所以比$pageCount大1
-        $count = 21;
+        $count = 11;
 
         $selector = AccountLogModel::where('uid', $userModel->uid);
         if ($id > 0) {
@@ -126,10 +126,6 @@ class GetAccountLogListV1 extends ServiceAbstract
                 $return['lastId'] = $v->id;
                 $i++;
             }
-        }
-
-        if (empty($return['list'])) {
-            $return['list'] = new \stdClass();
         }
 
         return $this->response($return);
