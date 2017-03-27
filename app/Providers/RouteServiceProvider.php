@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use App\Libraries\Utils;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,15 @@ class RouteServiceProvider extends ServiceProvider
         Route::group(['namespace' => $this->namespace . '\Upload', 'prefix' => 'upload'], function ()
         {
             Route::any('/personFrontPic/process', 'PersonFrontPicController@process');
+        });
+
+        //首页
+        Route::get('/', function () {
+            if (Utils\IsMobileVisit::has()) {
+                return view('welcome');
+            } else {//pc
+                return view('welcome');
+            }
         });
 
 
