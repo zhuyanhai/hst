@@ -46,9 +46,9 @@
         }
 
         .anim-opacity2{
-            animation: 2s opacity2 1s 1 alternate forwards;
-            -webkit-animation: 2s opacity2 1s 1 alternate forwards;
-            -moz-animation: 2s opacity2 1s 1 alternate forwards;
+            animation: 2s opacity2 0.5s 1 alternate forwards;
+            -webkit-animation: 2s opacity2 0.5s 1 alternate forwards;
+            -moz-animation: 2s opacity2 0.5s 1 alternate forwards;
         }
         @keyframes opacity2{
             0%{opacity:0}
@@ -67,47 +67,47 @@
         }
 
         .topup{
-            position: absolute;right:-20rem;top:0rem;width:9rem
+            position: absolute;right:0rem;top:-3rem;width:9rem
         }
 
         .anim-feiru1{
-            animation: 1s feiru1 0s 1 alternate forwards;
-            -webkit-animation: 1s feiru1 0s 1 alternate forwards;
-            -moz-animation: 1s feiru1 0s 1 alternate forwards;
+            animation: 0.5s feiru1 0s 1 alternate forwards;
+            -webkit-animation: 0.5s feiru1 0s 1 alternate forwards;
+            -moz-animation: 0.5s feiru1 0s 1 alternate forwards;
         }
         @keyframes feiru1{
-            0%{right:-20rem}
-            100%{right:0rem;}
+            0%{top:-3rem}
+            100%{top:0rem;}
         }
         @-webkit-keyframes feiru1{
-            0%{right:-20rem}
-            100%{right:0rem;}
+            0%{top:-3rem}
+            100%{top:0rem;}
         }
         @-moz-keyframes feiru1{
-            0%{right:-20rem}
-            100%{right:0rem;}
+            0%{top:-3rem}
+            100%{top:0rem;}
         }
 
         .topdown{
-            position: absolute;left:-20rem;bottom:0rem;width:90%
+            position: absolute;left:0rem;bottom:-3rem;width:90%
         }
 
         .anim-feiru2{
-            animation: 1s feiru2 0s 1 alternate forwards;
-            -webkit-animation: 1s feiru2 0s 1 alternate forwards;
-            -moz-animation: 1s feiru2 0s 1 alternate forwards;
+            animation: 0.5s feiru2 0s 1 alternate forwards;
+            -webkit-animation: 0.5s feiru2 0s 1 alternate forwards;
+            -moz-animation: 0.5s feiru2 0s 1 alternate forwards;
         }
         @keyframes feiru2{
-            0%{left:-20rem}
-            100%{left:0rem;}
+            0%{bottom:-3rem}
+            100%{bottom:0rem;}
         }
         @-webkit-keyframes feiru2{
-            0%{left:-20rem}
-            100%{left:0rem;}
+            0%{bottom:-3rem}
+            100%{bottom:0rem;}
         }
         @-moz-keyframes feiru2{
-            0%{left:-20rem}
-            100%{left:0rem;}
+            0%{bottom:-3rem}
+            100%{bottom:0rem;}
         }
 
         @media screen and (min-width: 320px) {
