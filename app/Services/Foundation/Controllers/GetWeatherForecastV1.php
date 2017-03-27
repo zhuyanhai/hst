@@ -74,6 +74,11 @@ class GetWeatherForecastV1 extends ServiceAbstract
             foreach ($list as &$v) {
                 $v['contents'] = preg_replace("%\\r%", '', $v['contents']);
                 $v['contents'] = preg_replace("%。%", "。\n", $v['contents']);
+                if ($v['type'] == 1) {
+                    $v['fishery_name'] = [];
+                } else {
+                    $v['fishery_name'] = explode('、',$v['fishery_name']);
+                }
             }
 
             $year  = mb_substr($dates, 0, 4);
