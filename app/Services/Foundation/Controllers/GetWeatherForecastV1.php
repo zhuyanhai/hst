@@ -73,6 +73,7 @@ class GetWeatherForecastV1 extends ServiceAbstract
             $list = $weatherForecastModel->toArray();
             foreach ($list as &$v) {
                 $v['contents'] = preg_replace("%\\r%", '', $v['contents']);
+                $v['contents'] = preg_replace("%。%", "。\n", $v['contents']);
             }
 
             $year  = mb_substr($dates, 0, 4);
