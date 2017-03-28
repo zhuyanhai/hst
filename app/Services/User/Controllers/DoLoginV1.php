@@ -3,6 +3,8 @@
 namespace App\Services\User\Controllers;
 
 use App\Services\ServiceAbstract;
+use App\Services\User\Helpers\LoginChecked;
+use App\Services\User\Models\SsoTicketLogModel;
 use App\Services\User\Models\UserModel;
 use App\Services\User\Helpers\LoginToken;
 use App\Services\User\Helpers\User;
@@ -65,6 +67,20 @@ class DoLoginV1 extends ServiceAbstract
 
                 //用户登录token
                 $result['data']['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
+
+                //sso_ticket - 生成单点登陆的sso_ticket
+                $result['data']['sso_ticket'] = LoginToken::sso_ticket($userModel->uid,$userModel->password);
+                //设置sso_ticket到用户数据表
+                $userModel->sso_ticket = $result['data']['sso_ticket'];
+                $userModel->save();
+
+                //记录用户登陆票据log
+                $sso_ticket = new SsoTicketLogModel();
+                $sso_ticket->sso_ticket = $userModel->sso_ticket;//票据
+                $sso_ticket->userid = $userModel->uid;//用户id
+                $sso_ticket->login_at = time();//登陆时间
+                $sso_ticket->system = $this->_params['_apiHeaders']['hst-system'][0];//系统
+                $sso_ticket->save();
 
                 //设置用户信息到openVpn
                 User::setInfoToOpenVpn($userModel->uid, $result['data']['token'], $userModel->traffic_patterns, $userModel->allow_external_updates, $this->_params['_apiHeaders']);

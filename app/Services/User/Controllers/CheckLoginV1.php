@@ -5,6 +5,7 @@ namespace App\Services\User\Controllers;
 use App\Services\ServiceAbstract;
 use App\Services\User\Helpers\LoginToken;
 use App\Services\User\Helpers\User;
+use App\Services\User\Models\SsoTicketLogModel;
 
 /**
  * 通过token检测用户是否登录服务
@@ -27,7 +28,7 @@ class CheckLoginV1 extends ServiceAbstract
         return $this->_validate($this->_params, [
             'token' => 'required|string',
         ], [
-            'token.required'  => '参数错误',
+            'token.required' => '参数错误',
             'token.string' => '参数错误',
         ]);
     }
@@ -49,6 +50,12 @@ class CheckLoginV1 extends ServiceAbstract
             $this->error('该帐号不存在');
         }
 
+        if ($userModel->sso_ticket != $this->_params['ssoTicket']) {
+            //获取上次登陆的票据提供给用户
+            $ssoTicket = SsoTicketLogModel::where('userid', $userid)->orderBy('id', 'desc')->first();
+            $msg = "您的账号于" . date('H:i:s', $ssoTicket->login_at) . "在另一台" . $ssoTicket->system . "手机登录。如非本人操作，则密码可能已泄露，建议联系客服进行修改，客服热线：0580-5850000";
+            $this->error($msg, 4001);
+        }
 
         if (intval($userModel->frozen) !== 1) {
             return $this->response($userModel->toArray());

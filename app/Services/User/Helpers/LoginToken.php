@@ -64,4 +64,16 @@ class LoginToken
         return $userid;
     }
 
+    /**
+     * 生成用户登录sso_ticket
+     *
+     * @param int $userid 用户ID
+     * @param string $password 用户密码
+     * @return string
+     */
+    public static function sso_ticket($userid, $password)
+    {
+        return str_shuffle(strtoupper(md5(md5($userid) . $password)) . (time() * mt_rand(0,999)));
+    }
+
 }

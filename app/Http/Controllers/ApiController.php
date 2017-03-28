@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\ApiException;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 
 abstract class ApiController extends BaseController
@@ -96,6 +95,7 @@ abstract class ApiController extends BaseController
 
         //指定有意义的错误段 4000 - 4999
         '4000' => '您处于未登陆状态，请先登录！',
+        '4001' => '您的账号于07:46在另一台Android手机登录。如非本人操作，则密码可能已泄露，建议联系客服进行修改，客服热线：0580-5850000',
 
         // 公共错误码
         '1001' => '[appId]缺失',
@@ -128,7 +128,7 @@ abstract class ApiController extends BaseController
      */
     public function __construct(Request $request)
     {
-        $this->_params  = $request->all();
+        $this->_params = $request->all();
         $this->_headers = $request->header();
         //if (isset($this->_params['jsoncallback'])) {
         if (isset($this->_params['p'])) {//临时
@@ -145,9 +145,10 @@ abstract class ApiController extends BaseController
             if (!isset($this->_headers['hst-token'])) {
                 return $this->error('', 4000)->response();
             }
-            $result = callService('user.checkLoginV1', ['token'=>$this->_headers['hst-token'][0]]);
+            $result = callService('user.checkLoginV1', ['token' => $this->_headers['hst-token'][0], 'ssoTicket' =>$this->_headers['hst-ticket'][0]]);
+            //$result = callService('user.checkLoginV1', ['token' => $this->_headers['hst-token'][0]]);
             if ($result['code'] != 0) {
-                return $this->error('', 4000);
+                return $this->error($result['msg'], $result['code']);
             } else {
                 $this->loginUserInfo = $result['data'];
             }
@@ -164,7 +165,7 @@ abstract class ApiController extends BaseController
      */
     protected function headerValidate()
     {
-        if (isset($this->_headers['hst-system']) && !in_array($this->_headers['hst-system'][0], ['android','iphone'])) {
+        if (isset($this->_headers['hst-system']) && !in_array($this->_headers['hst-system'][0], ['android', 'iphone'])) {
             $this->isH5Request = true;
             return true;
         }
@@ -184,7 +185,6 @@ abstract class ApiController extends BaseController
             'hst-system.required' => '9002',
             'hst-devicemac.required' => '9003',
             'hst-package.required' => '9004',
-            'hst-version.required' => '9005',
             'hst-version.required' => '9005',
             'hst-appid.required' => '9006',
         ];
@@ -265,7 +265,7 @@ abstract class ApiController extends BaseController
             ],
             'data' => $return['data'],
             'cookies' => $return['cookies'],
-        ], 200, ['Access-Control-Allow-Credentials'=>'true', 'Access-Control-Allow-Origin'=>'*']);
+        ], 200, ['Access-Control-Allow-Credentials' => 'true', 'Access-Control-Allow-Origin' => '*']);
 
         return false;
     }
@@ -291,9 +291,9 @@ abstract class ApiController extends BaseController
     /**
      * 根据给定的规则校验请求参数
      *
-     * @param  array  $args
-     * @param  array  $rules
-     * @param  array  $messages
+     * @param  array $args
+     * @param  array $rules
+     * @param  array $messages
      * @return boolean
      */
     protected function _validate(array $args, array $rules, array $messages = [])

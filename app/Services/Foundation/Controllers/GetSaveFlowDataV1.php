@@ -96,7 +96,7 @@ class GetSaveFlowDataV1 extends ServiceAbstract
             }
             $user = AccountModel::where('uid', $uid)->first();
             if ($user) {
-                $user->dsave = bcdiv($flow, 1024, 0);
+                $user->dsave = bcdiv($flow , 1024, 0);
                 $user->save();
             }
         }
@@ -115,7 +115,7 @@ class GetSaveFlowDataV1 extends ServiceAbstract
             }
             $user = AccountModel::where('uid', $uid)->first();
             if ($user) {
-                $user->msave = bcdiv($flow, 1024, 0);
+                $user->msave = bcdiv($flow , 1024, 0);
                 $user->save();
             }
         }
@@ -134,7 +134,7 @@ class GetSaveFlowDataV1 extends ServiceAbstract
             }
             $user = AccountModel::where('uid', $uid)->first();
             if ($user) {
-                $user->ysave = bcdiv($flow, 1024, 0);
+                $user->ysave = bcdiv($flow , 1024, 0);
                 $user->save();
             }
         }

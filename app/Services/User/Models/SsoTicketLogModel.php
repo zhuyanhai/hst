@@ -3,28 +3,17 @@
 namespace App\Services\User\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 /**
- * 用户注册后审核数据表
- *
- * Class UserRegisterCheckModel
- * @package App\Services\User\Models
+ * sso_ticket 用户登陆票据记录表 - log
  */
-class UserRegisterCheckModel extends Model
+class SsoTicketLogModel extends Model
 {
     /**
      * 数据表名
      *
      * @var string
      */
-    protected $table = 'user_register_check';
-
-    /**
-     * 数据表 - 主键字段名
-     *
-     * @var string
-     */
-    protected $primaryKey = 'uid';
+    protected $table = 'sso_ticket_log';
 
     /**
      * 表明模型是否应该被打上时间戳
@@ -34,5 +23,4 @@ class UserRegisterCheckModel extends Model
      * @var bool
      */
     public $timestamps = false;
-
 }

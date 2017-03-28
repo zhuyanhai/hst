@@ -5,26 +5,26 @@ namespace App\Services\User\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 用户注册后审核数据表
+ * 用户省流量 月 表
  *
- * Class UserRegisterCheckModel
+ * Class AccountSaveFlowMonthModel
  * @package App\Services\User\Models
  */
-class UserRegisterCheckModel extends Model
+class AccountSaveFlowMonthModel extends Model
 {
     /**
      * 数据表名
      *
      * @var string
      */
-    protected $table = 'user_register_check';
+    protected $table = 'account_save_flow_month';
 
     /**
      * 数据表 - 主键字段名
      *
      * @var string
      */
-    protected $primaryKey = 'uid';
+    protected $primaryKey = 'id';
 
     /**
      * 表明模型是否应该被打上时间戳
@@ -34,5 +34,7 @@ class UserRegisterCheckModel extends Model
      * @var bool
      */
     public $timestamps = false;
+
+
 
 }
