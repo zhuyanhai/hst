@@ -69,9 +69,9 @@ class DoLoginV1 extends ServiceAbstract
                 $result['data']['token'] = LoginToken::build($userModel->uid, $userModel->phone, $userModel->password, $userModel->createtime);
 
                 //sso_ticket - 生成单点登陆的sso_ticket
-                $result['data']['sso_ticket'] = LoginToken::sso_ticket($userModel->uid,$userModel->password);
+                $result['data']['ssoTicket'] = LoginToken::SsoTicket($userModel->uid,$userModel->password);
                 //设置sso_ticket到用户数据表
-                $userModel->sso_ticket = $result['data']['sso_ticket'];
+                $userModel->sso_ticket = $result['data']['ssoTicket'];
                 $userModel->save();
 
                 //记录用户登陆票据log

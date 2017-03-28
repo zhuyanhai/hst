@@ -25,9 +25,9 @@ class GetUserRegisterAuthV1Controller extends ApiController
     protected function paramsValidate()
     {
         return $this->_validate($this->_params, [
-            'type'  => 'required',
+            'action' => 'required',
         ], [
-            'type.required'  => '请告诉我搜索类型',
+            'action.required' => '请告知我你的动作',
         ]);
     }
 
@@ -43,16 +43,44 @@ class GetUserRegisterAuthV1Controller extends ApiController
     public function run()
     {
         /**
-         * 接口被调用默认状态 待审核
-         * 0 = 审核不通过
-         * 1 = 待审核
-         * 2 = 审核已通过
+         * 动作:
+         *      list > 列表
+         *      adopt > 通过
+         *      reject > 驳回
+         *
          */
-        $users = DB::table('user')
-            ->select('uid','phone','is_register_check','nickname','personid','person_front_pic','person_back_pic','createtime')
-            ->where('is_register_check','=',$this->_params['type'])
-            ->get()
-        ;
-        return $this->response($users);
+        switch ($this->_params['action']) {
+            case 'list':
+                $defaultPage = 20;
+                //根据页码获取用户
+                $users = DB::table('user')
+                    ->select('uid', 'phone', 'is_register_check', 'nickname', 'personid', 'person_front_pic', 'person_back_pic', 'createtime')
+                    ->where('is_register_check', '=', $this->_params['type'])
+                    ->paginate($defaultPage);
+                foreach ($users as $key => $user) {
+                    $list['data'][$key]['phone'] = $user->phone;//手机号码
+                    $list['data'][$key]['personid'] = $user->personid;//身份证号
+                    $list['data'][$key]['nickname'] = $user->nickname;//名字 | 是否是真实姓名
+                    $list['data'][$key]['is_register_check'] = $user->is_register_check;//是否被审核 012
+                    $list['data'][$key]['person_front_pic'] = $user->person_front_pic;//身份证前
+                    $list['data'][$key]['person_back_pic'] = $user->person_back_pic;//身份证后
+                    $list['data'][$key]['createtime'] = $user->createtime;//创建时间 | 身份证提交时间
+                }
+                //用户总数 | 总页码
+                $list['total'] = $users->total();
+                $list['lastPage'] = $users->lastPage();
+                //$list['thisPage'] = $this->_params['page'];
+                $result = $list;
+                break;
+            case 'adopt':
+
+                break;
+            case 'reject':
+
+                break;
+            default;
+        }
+
+        return $this->response($result);
     }
 }

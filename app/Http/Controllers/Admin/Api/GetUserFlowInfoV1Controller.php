@@ -54,7 +54,7 @@ class GetUserFlowInfoV1Controller extends ApiController
 
         //用户总数 | 总页码
         $list['total'] = $users->total();
-        $list['lastPage'] = $users->lastPage();;
+        $list['lastPage'] = $users->lastPage();
 
         return $this->response($list);
     }

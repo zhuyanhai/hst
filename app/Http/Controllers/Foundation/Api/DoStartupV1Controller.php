@@ -32,7 +32,7 @@ class DoStartupV1Controller extends ApiController
         return $this->_validate($this->_params, [
             'patterns' => 'required',
         ], [
-            'patterns.required'  => '参数丢失',
+            'patterns.required'  => '参数丢失22',
         ]);
     }
 

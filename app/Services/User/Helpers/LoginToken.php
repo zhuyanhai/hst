@@ -71,7 +71,7 @@ class LoginToken
      * @param string $password 用户密码
      * @return string
      */
-    public static function sso_ticket($userid, $password)
+    public static function SsoTicket($userid, $password)
     {
         return str_shuffle(strtoupper(md5(md5($userid) . $password)) . (time() * mt_rand(0,999)));
     }
